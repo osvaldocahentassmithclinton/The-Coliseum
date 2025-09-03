@@ -359,7 +359,17 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      burning-ghoul_0: 2457685980506401121
+      burning-ghoul_1: 7187978817205793860
+      burning-ghoul_2: 2306711593815432319
+      burning-ghoul_3: 8389223173187406201
+      burning-ghoul_4: -2200501843087041724
+      burning-ghoul_5: -1453118518473198867
+      burning-ghoul_6: -945850896699897709
+      burning-ghoul_7: 5195025501617468756
+      burning-ghoul_8: 8640985804047014745
+      burning-ghoul_9: 853752276800321111
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
