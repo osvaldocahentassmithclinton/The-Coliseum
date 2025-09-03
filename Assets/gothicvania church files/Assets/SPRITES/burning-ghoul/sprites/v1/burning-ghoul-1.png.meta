@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      burning-ghoul-1_0: -663668891249710059
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      angel-attack-3_0: -5141674958010512654
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

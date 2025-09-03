@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      flying-kick_0: -847255351352340155
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
