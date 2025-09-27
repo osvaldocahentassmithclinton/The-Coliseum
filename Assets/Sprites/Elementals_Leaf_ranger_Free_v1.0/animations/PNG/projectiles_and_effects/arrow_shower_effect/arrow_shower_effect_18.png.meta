@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      arrow_shower_effect_18_0: -5609137236195730887
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

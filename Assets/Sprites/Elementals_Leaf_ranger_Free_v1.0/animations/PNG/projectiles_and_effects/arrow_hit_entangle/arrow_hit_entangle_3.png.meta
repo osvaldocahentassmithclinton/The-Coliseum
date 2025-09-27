@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      arrow_hit_entangle_3_0: 130534088903121463
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

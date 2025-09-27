@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      arrow_hit_poison_3_0: 1363700669134788565
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
