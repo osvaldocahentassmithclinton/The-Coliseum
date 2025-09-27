@@ -5,7 +5,7 @@ public class KnightController : MonoBehaviour
     [Header("Movimento")]
     public float speed = 5f;
     public float jumpForce = 25f;
-    public float gravityScale = 5f; // 🔽 Gravidade personalizada
+    public float gravityScale = 5f;
 
     private Rigidbody2D rb;
     private Animator animator;
@@ -20,11 +20,19 @@ public class KnightController : MonoBehaviour
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
-        rb.gravityScale = gravityScale; // 🧲 Aplica gravidade personalizada
+        rb.gravityScale = gravityScale;
     }
 
     void Update()
     {
+        // Impede qualquer movimento durante o ataque
+        if (isAttacking)
+        {
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            animator.SetBool("isRunning", false);
+            return;
+        }
+
         float moveInput = Input.GetAxisRaw("Horizontal");
 
         // Movimento lateral
@@ -35,41 +43,23 @@ public class KnightController : MonoBehaviour
             spriteRenderer.flipX = moveInput < 0;
 
         // Pulo
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (Input.GetKey(KeyCode.Space) && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-            animator.Play("Jump");
         }
 
-        // Ataque
-        if (Input.GetKeyDown(KeyCode.Space) && !isAttacking)
+        // Ataque com botão esquerdo do mouse
+        if (Input.GetMouseButtonDown(0) && !isAttacking && isGrounded)
         {
             isAttacking = true;
-            animator.Play("Attack1");
+            animator.SetBool("isAttacking", true);
         }
 
-        // Atualiza animações
-        UpdateAnimations(moveInput);
-    }
-
-    void UpdateAnimations(float moveInput)
-    {
-        if (!isGrounded)
-        {
-            animator.Play("Fall");
-        }
-        else if (isAttacking)
-        {
-            // Ataque já foi iniciado
-        }
-        else if (moveInput != 0)
-        {
-            animator.Play("Run");
-        }
-        else
-        {
-            animator.Play("Idle");
-        }
+        // Atualiza parâmetros do Animator
+        animator.SetBool("isGrounded", isGrounded);
+        animator.SetBool("isRunning", moveInput != 0 && isGrounded);
+        animator.SetBool("isJumping", !isGrounded);
+        animator.SetFloat("verticalVelocity", rb.linearVelocity.y);
     }
 
     void OnCollisionEnter2D(Collision2D collision)
@@ -84,8 +74,10 @@ public class KnightController : MonoBehaviour
             isGrounded = false;
     }
 
+    // Chamado via Animation Event no final da animação de ataque
     public void EndAttack()
     {
         isAttacking = false;
+        animator.SetBool("isAttacking", false);
     }
 }
