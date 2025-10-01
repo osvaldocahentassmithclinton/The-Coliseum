@@ -11,8 +11,10 @@ public class KnightController : MonoBehaviour
     private Animator animator;
     private SpriteRenderer spriteRenderer;
 
+    private float verticalVelocity;
     private bool isGrounded = false;
     private bool isAttacking = false;
+    private bool isJumping = false;
 
     void Start()
     {
@@ -29,6 +31,7 @@ public class KnightController : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             animator.SetBool("isJumping", true);
+            animator.SetBool("isGrounded", false);
         }
     }
     void Attack() {
@@ -43,10 +46,13 @@ public class KnightController : MonoBehaviour
 
     void Update()
     {
+        Attack();
         Jump();
         // Impede qualquer movimento durante o ataque
-        
 
+        if (isJumping == true && verticalVelocity < 0) { 
+        
+        }
         float moveInput = Input.GetAxisRaw("Horizontal");
 
         // Movimento lateral
@@ -65,6 +71,8 @@ public class KnightController : MonoBehaviour
             isAttacking = true;
             animator.SetBool("isAttacking", true);
         }
+        if (isJumping == true && isGrounded) { 
+        }
         EndAttack();
         
 
@@ -72,6 +80,8 @@ public class KnightController : MonoBehaviour
         animator.SetBool("isGrounded", isGrounded);
         animator.SetBool("isRunning", moveInput != 0 && isGrounded);
         animator.SetBool("isJumping", !isGrounded);
+        verticalVelocity = rb.linearVelocity.y;
+        animator.SetBool("isFalling", verticalVelocity < 0);
         animator.SetFloat("verticalVelocity", rb.linearVelocity.y);
 
 
@@ -90,6 +100,8 @@ public class KnightController : MonoBehaviour
     }
 
     // Chamado via Animation Event no final da animação de ataque
+
+
     public void EndAttack()
     {
         if (!Input.GetMouseButtonDown(0))

@@ -599,7 +599,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 697175989543546851, guid: 9a011184eb94535448a750f84632ba97, type: 3}
       propertyPath: jumpForce
-      value: 10.36
+      value: 63.9
       objectReference: {fileID: 0}
     - target: {fileID: 697175989543546851, guid: 9a011184eb94535448a750f84632ba97, type: 3}
       propertyPath: gravityScale
@@ -1415,7 +1415,7 @@ GameObject:
   - component: {fileID: 900102840}
   m_Layer: 20
   m_Name: Platform
-  m_TagString: platform
+  m_TagString: ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
