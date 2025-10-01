@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.InputSystem.Controls;
 
 public class KnightController : MonoBehaviour
 {
@@ -11,6 +13,7 @@ public class KnightController : MonoBehaviour
     private Animator animator;
     private SpriteRenderer spriteRenderer;
 
+    private float timezin;
     private float verticalVelocity;
     private bool isGrounded = false;
     private bool isAttacking = false;
@@ -41,6 +44,7 @@ public class KnightController : MonoBehaviour
             animator.SetBool("isRunning", false);
             return;
         }
+       // else if()
     }
 
 
@@ -50,9 +54,10 @@ public class KnightController : MonoBehaviour
         Jump();
         // Impede qualquer movimento durante o ataque
 
-        if (isJumping == true && verticalVelocity < 0) { 
-        
-        }
+       
+       
+
+
         float moveInput = Input.GetAxisRaw("Horizontal");
 
         // Movimento lateral
@@ -74,6 +79,12 @@ public class KnightController : MonoBehaviour
         if (isJumping == true && isGrounded) { 
         }
         EndAttack();
+       // if () {
+       //     timezin = Time.deltaTime;
+      //      if (timezin > 1.5) { 
+          
+        //    }
+      //  }
         
 
         // Atualiza parâmetros do Animator
