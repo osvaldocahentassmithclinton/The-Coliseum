@@ -23,15 +23,29 @@ public class KnightController : MonoBehaviour
         rb.gravityScale = gravityScale;
     }
 
-    void Update()
+     void Jump()
     {
-        // Impede qualquer movimento durante o ataque
+        if (Input.GetKey(KeyCode.Space) && isGrounded)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            animator.SetBool("isJumping", true);
+        }
+    }
+    void Attack() {
         if (isAttacking)
         {
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
             animator.SetBool("isRunning", false);
             return;
         }
+    }
+
+
+    void Update()
+    {
+        Jump();
+        // Impede qualquer movimento durante o ataque
+        
 
         float moveInput = Input.GetAxisRaw("Horizontal");
 
@@ -43,10 +57,7 @@ public class KnightController : MonoBehaviour
             spriteRenderer.flipX = moveInput < 0;
 
         // Pulo
-        if (Input.GetKey(KeyCode.Space) && isGrounded)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-        }
+        
 
         // Ataque com botão esquerdo do mouse
         if (Input.GetMouseButtonDown(0) && !isAttacking && isGrounded)
@@ -54,12 +65,16 @@ public class KnightController : MonoBehaviour
             isAttacking = true;
             animator.SetBool("isAttacking", true);
         }
+        EndAttack();
+        
 
         // Atualiza parâmetros do Animator
         animator.SetBool("isGrounded", isGrounded);
         animator.SetBool("isRunning", moveInput != 0 && isGrounded);
         animator.SetBool("isJumping", !isGrounded);
         animator.SetFloat("verticalVelocity", rb.linearVelocity.y);
+
+
     }
 
     void OnCollisionEnter2D(Collision2D collision)
@@ -77,7 +92,16 @@ public class KnightController : MonoBehaviour
     // Chamado via Animation Event no final da animação de ataque
     public void EndAttack()
     {
-        isAttacking = false;
-        animator.SetBool("isAttacking", false);
+        if (!Input.GetMouseButtonDown(0))
+        {
+            isAttacking = false;
+            animator.SetBool("isAttacking", false);
+            if(isAttacking == false)
+            {
+                Debug.Log("Ataque finalizando");
+            }
+        }
     }
+    
 }
+    
