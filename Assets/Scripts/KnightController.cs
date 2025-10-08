@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
+using System.Collections;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.Rendering;
 
 public class KnightController : MonoBehaviour
 {
@@ -16,8 +18,9 @@ public class KnightController : MonoBehaviour
     private float timezin;
     private float verticalVelocity;
     private bool isGrounded = false;
-    private bool isAttacking = false;
+    public bool isAttacking = false;
     private bool isJumping = false;
+    private int comboStep = 0;
 
     void Start()
     {
@@ -37,20 +40,50 @@ public class KnightController : MonoBehaviour
             animator.SetBool("isGrounded", false);
         }
     }
-    void Attack() {
-        if (isAttacking)
+    void Attack()
+    {
+        isAttacking = true;
+        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        animator.SetBool("isRunning", false);
+        Debug.Log("Aiaiaia");
+
+        if (timezin < 1.5f)
         {
-            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-            animator.SetBool("isRunning", false);
-            return;
+            comboStep++;
+            Debug.Log(timezin);
         }
-       // else if()
+           
+        else
+        {
+            comboStep = 1;
+        }
+       
+        animator.SetBool("isAttacking", true);
+
+        if (comboStep > 2)
+        {
+            comboStep = 1;
+            Debug.Log("Segundo");
+        }
+
+        timezin = 0f;
+        StartCoroutine(EndAttackAfterDelay(0.7f));
+        Debug.Log("Aquiaa");
+
+    }
+
+    IEnumerator EndAttackAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        isAttacking = false;
+        animator.SetBool("isAttacking", false); 
+        Debug.Log("Golpe final");
     }
 
 
-    void Update()
+
+void Update()
     {
-        Attack();
         Jump();
         // Impede qualquer movimento durante o ataque
 
@@ -67,18 +100,20 @@ public class KnightController : MonoBehaviour
         if (moveInput != 0)
             spriteRenderer.flipX = moveInput < 0;
 
-        // Pulo
         
 
+
         // Ataque com botão esquerdo do mouse
-        if (Input.GetMouseButtonDown(0) && !isAttacking && isGrounded)
+        if (!isAttacking)
+            timezin += Time.deltaTime;
+
+        if (Input.GetMouseButtonDown(0) && isGrounded)
         {
-            isAttacking = true;
-            animator.SetBool("isAttacking", true);
+            Attack();
         }
-        if (isJumping == true && isGrounded) { 
-        }
-        EndAttack();
+       
+        
+        
        // if () {
        //     timezin = Time.deltaTime;
       //      if (timezin > 1.5) { 
@@ -94,6 +129,8 @@ public class KnightController : MonoBehaviour
         verticalVelocity = rb.linearVelocity.y;
         animator.SetBool("isFalling", verticalVelocity < 0);
         animator.SetFloat("verticalVelocity", rb.linearVelocity.y);
+        animator.SetInteger("comboStep", comboStep);
+        
 
 
     }
@@ -113,18 +150,7 @@ public class KnightController : MonoBehaviour
     // Chamado via Animation Event no final da animação de ataque
 
 
-    public void EndAttack()
-    {
-        if (!Input.GetMouseButtonDown(0))
-        {
-            isAttacking = false;
-            animator.SetBool("isAttacking", false);
-            if(isAttacking == false)
-            {
-                Debug.Log("Ataque finalizando");
-            }
-        }
-    }
+    
     
 }
     
