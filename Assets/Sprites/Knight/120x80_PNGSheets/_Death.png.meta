@@ -130,10 +130,10 @@ TextureImporter:
       name: _Death_0
       rect:
         serializedVersion: 2
-        x: 35
+        x: 0
         y: 0
-        width: 32
-        height: 40
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -152,10 +152,10 @@ TextureImporter:
       name: _Death_1
       rect:
         serializedVersion: 2
-        x: 150
-        y: 1
-        width: 31
-        height: 40
+        x: 120
+        y: 0
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -174,10 +174,10 @@ TextureImporter:
       name: _Death_2
       rect:
         serializedVersion: 2
-        x: 264
-        y: 5
-        width: 34
-        height: 27
+        x: 240
+        y: 0
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -196,10 +196,10 @@ TextureImporter:
       name: _Death_3
       rect:
         serializedVersion: 2
-        x: 378
-        y: 6
-        width: 37
-        height: 25
+        x: 360
+        y: 0
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -218,10 +218,10 @@ TextureImporter:
       name: _Death_4
       rect:
         serializedVersion: 2
-        x: 492
+        x: 480
         y: 0
-        width: 40
-        height: 25
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -240,10 +240,10 @@ TextureImporter:
       name: _Death_5
       rect:
         serializedVersion: 2
-        x: 612
+        x: 600
         y: 0
-        width: 39
-        height: 22
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -262,10 +262,10 @@ TextureImporter:
       name: _Death_6
       rect:
         serializedVersion: 2
-        x: 732
+        x: 720
         y: 0
-        width: 39
-        height: 23
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -284,10 +284,10 @@ TextureImporter:
       name: _Death_7
       rect:
         serializedVersion: 2
-        x: 852
+        x: 840
         y: 0
-        width: 41
-        height: 18
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -306,10 +306,10 @@ TextureImporter:
       name: _Death_8
       rect:
         serializedVersion: 2
-        x: 972
+        x: 960
         y: 0
-        width: 43
-        height: 14
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -328,10 +328,10 @@ TextureImporter:
       name: _Death_9
       rect:
         serializedVersion: 2
-        x: 1092
+        x: 1080
         y: 0
-        width: 43
-        height: 14
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -350,7 +350,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: d36e1118cdaaeab4f9d460d0ed13dc3c
     internalID: 0
     vertices: []
     indices: 

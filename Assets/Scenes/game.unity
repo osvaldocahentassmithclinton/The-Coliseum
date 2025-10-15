@@ -598,13 +598,9 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 697175989543546851, guid: 9a011184eb94535448a750f84632ba97, type: 3}
-      propertyPath: jumpForce
-      value: 63.9
-      objectReference: {fileID: 0}
-    - target: {fileID: 697175989543546851, guid: 9a011184eb94535448a750f84632ba97, type: 3}
-      propertyPath: gravityScale
-      value: 8.58
-      objectReference: {fileID: 0}
+      propertyPath: hitbox
+      value: 
+      objectReference: {fileID: 2049069036}
     - target: {fileID: 1523871492382348089, guid: 9a011184eb94535448a750f84632ba97, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5.3
@@ -644,6 +640,18 @@ PrefabInstance:
     - target: {fileID: 1523871492382348089, guid: 9a011184eb94535448a750f84632ba97, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2944786333411304448, guid: 9a011184eb94535448a750f84632ba97, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4692402448120875173, guid: 9a011184eb94535448a750f84632ba97, type: 3}
+      propertyPath: m_Offset.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4692402448120875173, guid: 9a011184eb94535448a750f84632ba97, type: 3}
+      propertyPath: m_Offset.y
+      value: -0.2
       objectReference: {fileID: 0}
     - target: {fileID: 9219821151951488813, guid: 9a011184eb94535448a750f84632ba97, type: 3}
       propertyPath: m_Name
@@ -6369,6 +6377,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1960315410}
   m_CullTransparentMesh: 1
+--- !u!1 &2049069036 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2944786333411304448, guid: 9a011184eb94535448a750f84632ba97, type: 3}
+  m_PrefabInstance: {fileID: 370654553}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2056363803
 GameObject:
   m_ObjectHideFlags: 0

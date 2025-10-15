@@ -10,10 +10,12 @@ public class KnightController : MonoBehaviour
     public float speed = 5f;
     public float jumpForce = 25f;
     public float gravityScale = 5f;
+    public float life = 30f;  
 
     private Rigidbody2D rb;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
+    public GameObject hitbox;
 
     private float timezin;
     private float verticalVelocity;
@@ -22,16 +24,9 @@ public class KnightController : MonoBehaviour
     private bool isJumping = false;
     private int comboStep = 0;
 
-    void Start()
-    {
-        rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
 
-        rb.gravityScale = gravityScale;
-    }
 
-     void Jump()
+    void Jump()
     {
         if (Input.GetKey(KeyCode.Space) && isGrounded)
         {
@@ -42,44 +37,75 @@ public class KnightController : MonoBehaviour
     }
     void Attack()
     {
+        if (isAttacking) return; // impede ataque se já está no meio de outro
+
         isAttacking = true;
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         animator.SetBool("isRunning", false);
-        Debug.Log("Aiaiaia");
 
-        if (timezin < 1.5f)
+        // verifica se está dentro da janela de 1 segundo para continuar combo
+        if (timezin < 1.0f)
         {
             comboStep++;
-            Debug.Log(timezin);
         }
-           
         else
         {
-            comboStep = 1;
+            comboStep = 1; // reinicia combo
         }
-       
-        animator.SetBool("isAttacking", true);
 
         if (comboStep > 2)
         {
             comboStep = 1;
-            Debug.Log("Segundo");
         }
 
-        timezin = 0f;
-        StartCoroutine(EndAttackAfterDelay(0.7f));
-        Debug.Log("Aquiaa");
+        animator.SetBool("isAttacking", true);
+        animator.SetInteger("comboStep", comboStep);
 
+        timezin = 0f; // zera contador de tempo
+        Debug.Log("Atacando passo " + comboStep);
     }
 
-    IEnumerator EndAttackAfterDelay(float delay)
+    // chamado via Animation Event no último frame da animação
+    public void EndAttack()
     {
-        yield return new WaitForSeconds(delay);
         isAttacking = false;
-        animator.SetBool("isAttacking", false); 
-        Debug.Log("Golpe final");
+        animator.SetBool("isAttacking", false);
+        Debug.Log("Fim do ataque");
+
+        // se já passou de 1 segundo, reseta combo
+        if (timezin > 1.0f)
+        {
+            comboStep = 0;
+            animator.SetInteger("comboStep", 0);
+        }
     }
 
+    public void EnableHitbox()
+    {
+        hitbox.SetActive(true);
+        Debug.Log("Hitbox ativada");
+    }
+
+    public void DisableHitbox()
+    {
+        hitbox.SetActive(false);
+        Debug.Log("Hitbox desativada");
+    }
+
+
+
+
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+
+        rb.gravityScale = gravityScale;
+    }
+
+    
 
 
 void Update()

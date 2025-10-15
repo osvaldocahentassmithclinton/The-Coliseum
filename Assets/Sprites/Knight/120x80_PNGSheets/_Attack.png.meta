@@ -112,10 +112,10 @@ TextureImporter:
       name: _Attack_0
       rect:
         serializedVersion: 2
-        x: 35
+        x: 0
         y: 0
-        width: 41
-        height: 38
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -134,10 +134,10 @@ TextureImporter:
       name: _Attack_1
       rect:
         serializedVersion: 2
-        x: 170
+        x: 120
         y: 0
-        width: 68
-        height: 44
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -156,10 +156,10 @@ TextureImporter:
       name: _Attack_2
       rect:
         serializedVersion: 2
-        x: 292
+        x: 240
         y: 0
-        width: 67
-        height: 37
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -178,10 +178,10 @@ TextureImporter:
       name: _Attack_3
       rect:
         serializedVersion: 2
-        x: 412
+        x: 360
         y: 0
-        width: 61
-        height: 36
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -200,7 +200,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 2e8d4d847f0051d4fb32fab310ab4d23
     internalID: 0
     vertices: []
     indices: 

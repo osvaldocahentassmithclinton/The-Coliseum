@@ -118,10 +118,10 @@ TextureImporter:
       name: _Attack2_0
       rect:
         serializedVersion: 2
-        x: 41
+        x: 0
         y: 0
-        width: 40
-        height: 38
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -140,10 +140,10 @@ TextureImporter:
       name: _Attack2_1
       rect:
         serializedVersion: 2
-        x: 157
+        x: 120
         y: 0
-        width: 44
-        height: 38
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -162,10 +162,10 @@ TextureImporter:
       name: _Attack2_2
       rect:
         serializedVersion: 2
-        x: 272
+        x: 240
         y: 0
-        width: 79
-        height: 42
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -184,10 +184,10 @@ TextureImporter:
       name: _Attack2_3
       rect:
         serializedVersion: 2
-        x: 389
+        x: 360
         y: 0
-        width: 66
-        height: 37
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -206,10 +206,10 @@ TextureImporter:
       name: _Attack2_4
       rect:
         serializedVersion: 2
-        x: 509
+        x: 480
         y: 0
-        width: 48
-        height: 37
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -228,10 +228,10 @@ TextureImporter:
       name: _Attack2_5
       rect:
         serializedVersion: 2
-        x: 629
+        x: 600
         y: 0
-        width: 47
-        height: 37
+        width: 120
+        height: 80
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -250,7 +250,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: fdd6373ff030cc94c9ce0c490e47d36a
     internalID: 0
     vertices: []
     indices: 
