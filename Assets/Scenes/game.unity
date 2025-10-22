@@ -501,7 +501,7 @@ MonoBehaviour:
   - characterName: dwarf
     prefab: {fileID: 0}
   - characterName: elf
-    prefab: {fileID: 0}
+    prefab: {fileID: 5666702232877693944, guid: 59dfd4872d9cd304b86ffc7bf5f04e8e, type: 3}
   - characterName: mage
     prefab: {fileID: 0}
   spawnPoint: {fileID: 641572019}
