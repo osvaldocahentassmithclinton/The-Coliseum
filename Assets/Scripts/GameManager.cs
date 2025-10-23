@@ -11,13 +11,12 @@ public class GameManager : MonoBehaviour
 
     public CharacterPrefab[] characterPrefabs;
 
-    public Transform spawnPoint; // Arraste no Inspector o Transform que marca o local do spawn
+    public Transform spawnPoint; 
 
     private void Start()
     {
         string selected = CharacterSelectionManager.selectedCharacter;
 
-        // Busca o prefab correspondente ao personagem selecionado
         foreach (var cp in characterPrefabs)
         {
             if (cp.characterName == selected)
