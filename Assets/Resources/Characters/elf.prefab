@@ -219,7 +219,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 8.58
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -241,7 +241,7 @@ CapsuleCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: f7ba8e2fea7aade488bad32d47fb472d, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -280,14 +280,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f44b6e8533dc574489741a3091db180c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
-  jumpForce: 8
-  groundCheck: {fileID: 2714145042569071113}
+  speed: 15
+  jumpForce: 42
+  groundCheck: {fileID: 0}
   groundCheckRadius: 0.2
   groundLayer:
     serializedVersion: 2
     m_Bits: 1048576
-  slideSpeed: 10
+  slideSpeed: 25
   slideDuration: 0.5
   attack1Hitbox: {fileID: 1392110784317897779}
   attack3Hitbox: {fileID: 8791721780130311769}

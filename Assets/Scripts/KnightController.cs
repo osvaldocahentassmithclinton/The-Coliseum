@@ -1,8 +1,6 @@
 using System;
 using UnityEngine;
 using System.Collections;
-using UnityEngine.InputSystem.Controls;
-using UnityEngine.Rendering;
 
 public class KnightController : MonoBehaviour
 {
@@ -10,7 +8,9 @@ public class KnightController : MonoBehaviour
     public float speed = 5f;
     public float jumpForce = 25f;
     public float gravityScale = 5f;
-    public float life = 30f;  
+    public float life = 30f;
+    public float rollForce = 10f;      // Força do impulso do rolamento
+    public float rollDuration = 0.6f;  // Duração da rolagem
 
     private Rigidbody2D rb;
     private Animator animator;
@@ -22,57 +22,104 @@ public class KnightController : MonoBehaviour
     private bool isGrounded = false;
     public bool isAttacking = false;
     private bool isJumping = false;
+    private bool isRolling = false; // novo
+    private bool canTakeDamage = true;
     private int comboStep = 0;
 
 
+    void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        rb.gravityScale = gravityScale;
+    }
+
+    void Update()
+    {
+        if (isRolling) return; // trava tudo durante o roll
+
+        Jump();
+
+        float moveInput = Input.GetAxisRaw("Horizontal");
+
+        // Movimento lateral (somente se não estiver atacando)
+        if (!isAttacking)
+            rb.linearVelocity = new Vector2(moveInput * speed, rb.linearVelocity.y);
+
+        // Flip do sprite
+        if (moveInput != 0)
+            spriteRenderer.flipX = moveInput < 0;
+
+        // Ataque com botão esquerdo do mouse
+        if (!isAttacking)
+            timezin += Time.deltaTime;
+
+        if (Input.GetMouseButtonDown(0) && isGrounded && !isRolling)
+        {
+            Attack();
+        }
+
+        // Rolamento (Shift)
+        if (Input.GetKeyDown(KeyCode.LeftShift) && isGrounded && !isAttacking && !isJumping)
+        {
+            StartCoroutine(Roll());
+        }
+
+        // Atualiza parâmetros do Animator
+        animator.SetBool("isGrounded", isGrounded);
+        animator.SetBool("isRunning", moveInput != 0 && isGrounded && !isRolling);
+        animator.SetBool("isJumping", !isGrounded);
+        verticalVelocity = rb.linearVelocity.y;
+        animator.SetBool("isFalling", verticalVelocity < 0);
+        animator.SetFloat("verticalVelocity", rb.linearVelocity.y);
+        animator.SetInteger("comboStep", comboStep);
+    }
 
     void Jump()
     {
-        if (Input.GetKey(KeyCode.Space) && isGrounded)
+        if (Input.GetKey(KeyCode.Space) && isGrounded && !isRolling)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             animator.SetBool("isJumping", true);
             animator.SetBool("isGrounded", false);
+            isJumping = true;
         }
     }
+
     void Attack()
     {
-        if (isAttacking) return; // impede ataque se já está no meio de outro
+        if (isAttacking || isRolling) return;
 
         isAttacking = true;
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         animator.SetBool("isRunning", false);
 
-        // verifica se está dentro da janela de 1 segundo para continuar combo
         if (timezin < 1.0f)
         {
             comboStep++;
         }
         else
         {
-            comboStep = 1; // reinicia combo
-        }
-
-        if (comboStep > 2)
-        {
             comboStep = 1;
         }
 
+        if (comboStep > 2)
+            comboStep = 1;
+
         animator.SetBool("isAttacking", true);
         animator.SetInteger("comboStep", comboStep);
+        timezin = 0f;
 
-        timezin = 0f; // zera contador de tempo
         Debug.Log("Atacando passo " + comboStep);
     }
 
-    // chamado via Animation Event no último frame da animação
     public void EndAttack()
     {
         isAttacking = false;
         animator.SetBool("isAttacking", false);
         Debug.Log("Fim do ataque");
 
-        // se já passou de 1 segundo, reseta combo
         if (timezin > 1.0f)
         {
             comboStep = 0;
@@ -83,88 +130,51 @@ public class KnightController : MonoBehaviour
     public void EnableHitbox()
     {
         hitbox.SetActive(true);
-        Debug.Log("Hitbox ativada");
     }
 
     public void DisableHitbox()
     {
         hitbox.SetActive(false);
-        Debug.Log("Hitbox desativada");
     }
 
-
-
-
-
-    void Start()
+    // ---- ROLAMENTO ----
+    private IEnumerator Roll()
     {
-        rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        isRolling = true;
+        canTakeDamage = false;
+        animator.SetBool("isRolling", true);
 
-        rb.gravityScale = gravityScale;
-    }
+        float direction = spriteRenderer.flipX ? -1 : 1;
+        rb.linearVelocity = new Vector2(direction * rollForce, 0);
 
-    
-
-
-void Update()
-    {
-        Jump();
-        // Impede qualquer movimento durante o ataque
-
-       
-       
-
-
-        float moveInput = Input.GetAxisRaw("Horizontal");
-
-        // Movimento lateral
-        rb.linearVelocity = new Vector2(moveInput * speed, rb.linearVelocity.y);
-
-        // Flip do sprite
-        if (moveInput != 0)
-            spriteRenderer.flipX = moveInput < 0;
-
-        
-
-
-        // Ataque com botão esquerdo do mouse
-        if (!isAttacking)
-            timezin += Time.deltaTime;
-
-        if (Input.GetMouseButtonDown(0) && isGrounded)
+        // Espera até a animação acabar ou até o tempo máximo
+        float elapsed = 0f;
+        while (elapsed < rollDuration)
         {
-            Attack();
+            elapsed += Time.deltaTime;
+            yield return null;
         }
-       
-        
-        
-       // if () {
-       //     timezin = Time.deltaTime;
-      //      if (timezin > 1.5) { 
-          
-        //    }
-      //  }
-        
 
-        // Atualiza parâmetros do Animator
-        animator.SetBool("isGrounded", isGrounded);
-        animator.SetBool("isRunning", moveInput != 0 && isGrounded);
-        animator.SetBool("isJumping", !isGrounded);
-        verticalVelocity = rb.linearVelocity.y;
-        animator.SetBool("isFalling", verticalVelocity < 0);
-        animator.SetFloat("verticalVelocity", rb.linearVelocity.y);
-        animator.SetInteger("comboStep", comboStep);
-        
-
-
+        EndRoll();
     }
+
+
+    public void EndRoll()
+    {
+        isRolling = false;
+        canTakeDamage = true;
+        animator.SetBool("isRolling", false);
+        Debug.Log("Fim do rolamento");
+    }
+
 
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("ground"))
+        {
             isGrounded = true;
+            isJumping = false;
+        }
     }
 
     void OnCollisionExit2D(Collision2D collision)
@@ -172,11 +182,4 @@ void Update()
         if (collision.gameObject.CompareTag("ground"))
             isGrounded = false;
     }
-
-    // Chamado via Animation Event no final da animação de ataque
-
-
-    
-    
 }
-    
