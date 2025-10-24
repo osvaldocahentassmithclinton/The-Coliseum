@@ -5,21 +5,22 @@ public class ProjectileArrow : MonoBehaviour
 {
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
-
     private Animator anim;
 
     private float direction = 1f;
-    private bool hasCollided = false;
+    private bool hasHitWall = false;
+    private bool isFading = false;
 
     [Header("Configurações da Flecha")]
     public float speed = 10f;
     public float lifeTime = 3f;
-    public float stickDuration = 5f;
+    public float stickDuration = 3f;
     public float fadeDuration = 1.5f;
 
     [Header("Camadas de Colisão")]
     public LayerMask wallLayer;
     public LayerMask playerLayer;
+    public LayerMask enemyLayer;
 
     void Awake()
     {
@@ -30,6 +31,7 @@ public class ProjectileArrow : MonoBehaviour
 
     void Start()
     {
+        // Destroi depois de um tempo, se não colidir
         Destroy(gameObject, lifeTime);
     }
 
@@ -37,6 +39,7 @@ public class ProjectileArrow : MonoBehaviour
     {
         direction = dir;
 
+        // Inverte o sprite conforme direção
         Vector3 scale = transform.localScale;
         scale.x = Mathf.Abs(scale.x) * (dir < 0 ? -1 : 1);
         transform.localScale = scale;
@@ -45,54 +48,60 @@ public class ProjectileArrow : MonoBehaviour
             rb.linearVelocity = new Vector2(direction * speed, 0f);
     }
 
+    void FixedUpdate()
+    {
+        // Continua andando até colidir com parede
+        if (!hasHitWall && !isFading)
+        {
+            rb.linearVelocity = new Vector2(direction * speed, rb.linearVelocity.y);
+        }
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (hasCollided) return;
+        if (isFading) return; // já tá morrendo
 
         int layer = other.gameObject.layer;
 
+        // Parede (tilemap, chão, etc)
         if (((1 << layer) & wallLayer) != 0)
         {
             StartCoroutine(HandleWallCollision());
         }
-        else if (((1 << layer) & playerLayer) != 0)
+        // Inimigo (ou player, dependendo da lógica)
+        else if (((1 << layer) & enemyLayer) != 0)
         {
-            StartCoroutine(HandlePlayerCollision());
+            StartCoroutine(HandleEnemyHit());
         }
     }
 
     private IEnumerator HandleWallCollision()
     {
-        hasCollided = true;
-
+        hasHitWall = true;
         rb.linearVelocity = Vector2.zero;
-        rb.isKinematic = true;
+        rb.isKinematic = true; // trava a física
         rb.simulated = false;
 
         if (anim != null)
             anim.SetTrigger("Stick");
 
         yield return new WaitForSeconds(stickDuration);
-
         yield return StartCoroutine(FadeOut());
+
         Destroy(gameObject);
     }
 
-    private IEnumerator HandlePlayerCollision()
+    private IEnumerator HandleEnemyHit()
     {
-        hasCollided = true;
-
-        rb.linearVelocity = Vector2.zero;
-        rb.isKinematic = true;
-
-        yield return StartCoroutine(FadeOut());
-        Destroy(gameObject);
+        // Continua andando pra frente, mas começa o fade
+        StartCoroutine(FadeOut());
+        yield break;
     }
 
     private IEnumerator FadeOut()
     {
-        if (spriteRenderer == null)
-            yield break;
+        if (isFading) yield break;
+        isFading = true;
 
         float elapsed = 0f;
         Color color = spriteRenderer.color;
@@ -105,5 +114,7 @@ public class ProjectileArrow : MonoBehaviour
             spriteRenderer.color = color;
             yield return null;
         }
+
+        Destroy(gameObject);
     }
 }

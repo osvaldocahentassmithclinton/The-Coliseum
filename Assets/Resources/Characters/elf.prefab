@@ -291,7 +291,7 @@ MonoBehaviour:
   slideDuration: 0.5
   attack1Hitbox: {fileID: 1392110784317897779}
   attack3Hitbox: {fileID: 8791721780130311769}
-  projectilePrefab: {fileID: 5742056405310911495, guid: ca37bc07abf47df45885038e18e03db2, type: 3}
+  projectilePrefab: {fileID: 4479348772923947313, guid: f4c8dd77c3b426442ac9329008327eb5, type: 3}
   projectileSpawnPoint: {fileID: 8998352216864367972}
   projectileSpeed: 10
 --- !u!95 &5284388467701414227
@@ -341,7 +341,7 @@ Transform:
   m_GameObject: {fileID: 8656601750931557157}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.374, y: -0.313, z: 0}
+  m_LocalPosition: {x: 0.374, y: -0.292, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

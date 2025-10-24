@@ -141,11 +141,6 @@ public class ElfController : MonoBehaviour
         anim.SetTrigger(attackName);
 
         // Ataque 2 do projétil
-        if (attackName == "Attack2")
-        {
-            yield return new WaitForSeconds(0.15f);
-            ShootProjectile();
-        }
 
         float attackDuration = anim.GetCurrentAnimatorStateInfo(0).length;
         yield return new WaitForSeconds(attackDuration);
