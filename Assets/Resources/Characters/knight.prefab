@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 172127054528575867}
   - component: {fileID: 2463072299892875413}
+  - component: {fileID: 4818703317319044}
   m_Layer: 0
   m_Name: Hitbox
   m_TagString: Untagged
@@ -78,6 +79,22 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.61, y: 0.43}
   m_EdgeRadius: 0
+--- !u!114 &4818703317319044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2944786333411304448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 189434af2bcb013488142fb15e05949a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 10
+  targetTag: 
+  destroyAfterTime: 0
+  lifeTime: 0
 --- !u!1 &9219821151951488813
 GameObject:
   m_ObjectHideFlags: 0
@@ -92,6 +109,7 @@ GameObject:
   - component: {fileID: 4692402448120875173}
   - component: {fileID: 5104460485653436629}
   - component: {fileID: 697175989543546851}
+  - component: {fileID: 1333531912567830024}
   m_Layer: 19
   m_Name: knight
   m_TagString: Untagged
@@ -271,8 +289,22 @@ MonoBehaviour:
   speed: 15
   jumpForce: 42
   gravityScale: 8.58
-  life: 30
   rollForce: 25
   rollDuration: 0.4
   hitbox: {fileID: 0}
-  isAttacking: 0
+  hitboxChildName: Hitbox
+--- !u!114 &1333531912567830024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9219821151951488813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0d8f4a039aab3840a1e8d0727b65cda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  damageCooldown: 0.5
+  opponent: {fileID: 0}

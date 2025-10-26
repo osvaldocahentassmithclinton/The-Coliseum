@@ -5,15 +5,16 @@ using System.Collections.Generic;
 
 public class CharacterSelectionManager : MonoBehaviour
 {
-    [SerializeField] private string gameSceneName = "game";
-
+    [SerializeField] private string gameSceneName = "realgame";
     [SerializeField] private Button confirmButton;
-
-    private string preSelectedCharacter;
 
     [SerializeField] private List<CharacterButton> characterButtons;
 
-    public static string selectedCharacter;
+    public static string selectedCharacterP1;
+    public static string selectedCharacterP2;
+
+    private int currentPlayer = 1;
+    private string preSelectedCharacter;
 
     private void Start()
     {
@@ -26,27 +27,31 @@ public class CharacterSelectionManager : MonoBehaviour
         }
     }
 
-    // Ao clicar em um dos personagens
-    public void PreSelectCharacter(string characterName)
+    public void PreSelectCharacter(string name)
     {
-        preSelectedCharacter = characterName;
+        preSelectedCharacter = name;
         confirmButton.interactable = true;
 
-        // Botar bordas na seleção
         foreach (var btn in characterButtons)
-        {
-            btn.SetSelected(btn.characterName == characterName);
-        }
-
-        Debug.Log("Pré-selecionado: " + characterName);
+            btn.SetSelected(btn.characterName == name);
     }
 
     public void ConfirmSelection()
     {
-        if (!string.IsNullOrEmpty(preSelectedCharacter))
+        if (string.IsNullOrEmpty(preSelectedCharacter)) return;
+
+        if (currentPlayer == 1)
         {
-            selectedCharacter = preSelectedCharacter;
-            Debug.Log("Personagem confirmado: " + selectedCharacter);
+            selectedCharacterP1 = preSelectedCharacter;
+            currentPlayer = 2;
+            confirmButton.interactable = false;
+            preSelectedCharacter = null;
+            Debug.Log("Jogador 1 escolheu: " + selectedCharacterP1);
+        }
+        else
+        {
+            selectedCharacterP2 = preSelectedCharacter;
+            Debug.Log("Jogador 2 escolheu: " + selectedCharacterP2);
             SceneManager.LoadScene(gameSceneName);
         }
     }

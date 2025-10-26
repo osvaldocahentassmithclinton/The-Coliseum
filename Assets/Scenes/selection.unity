@@ -1377,7 +1377,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 846470859}
+      - m_Target: {fileID: 846470861}
         m_TargetAssemblyTypeName: CharacterSelectionManager, Assembly-CSharp
         m_MethodName: ConfirmSelection
         m_Mode: 1
@@ -1548,7 +1548,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 846470860}
-  - component: {fileID: 846470859}
+  - component: {fileID: 846470861}
   m_Layer: 0
   m_Name: CharacterSelectionManagar
   m_TagString: Untagged
@@ -1556,26 +1556,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &846470859
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 846470858}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c9a4117c21cc4e4da05838a0aae9b55, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameSceneName: game
-  confirmButton: {fileID: 677099958}
-  characterButtons:
-  - {fileID: 1790037309}
-  - {fileID: 1385026601}
-  - {fileID: 114154448}
-  - {fileID: 310081165}
-  - {fileID: 1155766519}
 --- !u!4 &846470860
 Transform:
   m_ObjectHideFlags: 0
@@ -1591,6 +1571,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &846470861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846470858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c9a4117c21cc4e4da05838a0aae9b55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameSceneName: realgame
+  confirmButton: {fileID: 677099958}
+  characterButtons:
+  - {fileID: 1790037309}
+  - {fileID: 1385026601}
+  - {fileID: 114154448}
+  - {fileID: 310081165}
+  - {fileID: 1155766519}
 --- !u!1 &846817214
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,11 +4,9 @@ using UnityEngine.UI;
 public class CharacterButton : MonoBehaviour
 {
     public string characterName;
-
     [SerializeField] private GameObject selectionBorder;
 
     private Button button;
-
     private CharacterSelectionManager manager;
 
     private void Awake()
@@ -26,16 +24,12 @@ public class CharacterButton : MonoBehaviour
     private void OnClick()
     {
         if (manager != null)
-        {
             manager.PreSelectCharacter(characterName);
-        }
     }
 
     public void SetSelected(bool selected)
     {
         if (selectionBorder != null)
-        {
             selectionBorder.SetActive(selected);
-        }
     }
 }

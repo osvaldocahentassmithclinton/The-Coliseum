@@ -1,185 +1,181 @@
-using System;
 using UnityEngine;
 using System.Collections;
+using System;
 
+[RequireComponent(typeof(Rigidbody2D), typeof(Animator), typeof(Damageable))]
 public class KnightController : MonoBehaviour
 {
     [Header("Movimento")]
     public float speed = 5f;
     public float jumpForce = 25f;
     public float gravityScale = 5f;
-    public float life = 30f;
-    public float rollForce = 10f;      // Força do impulso do rolamento
-    public float rollDuration = 0.6f;  // Duração da rolagem
+    public float rollForce = 10f;
+    public float rollDuration = 0.6f;
+
+    [Header("Combate")]
+    [SerializeField] private GameObject hitbox;
+    [SerializeField] private string hitboxChildName = "AttackHitbox";
+
+    [Header("Dano pós-movimento")]
+    public float activeDamageDuration = 2f;
+    private float lastMoveTime;
 
     private Rigidbody2D rb;
-    private Animator animator;
-    private SpriteRenderer spriteRenderer;
-    public GameObject hitbox;
+    private Animator anim;
+    private SpriteRenderer sr;
+    private Damageable damageable;
 
-    private float timezin;
-    private float verticalVelocity;
-    private bool isGrounded = false;
-    public bool isAttacking = false;
-    private bool isJumping = false;
-    private bool isRolling = false; // novo
-    private bool canTakeDamage = true;
-    private int comboStep = 0;
+    private float timeSinceAttack;
+    private bool isGrounded;
+    private bool isAttacking;
+    private bool isRolling;
+    private bool isDead;
+    private int comboStep;
 
+    private int selfLayerID;
+    private bool hasHitThisActivation = false;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        anim = GetComponent<Animator>();
+        sr = GetComponent<SpriteRenderer>();
+        damageable = GetComponent<Damageable>();
+
+        selfLayerID = gameObject.layer;
         rb.gravityScale = gravityScale;
+
+        if (hitbox == null)
+        {
+            Transform childTransform = transform.Find(hitboxChildName);
+            if (childTransform != null)
+                hitbox = childTransform.gameObject;
+        }
+
+        if (hitbox) hitbox.SetActive(false);
+
+        damageable.onHit += OnTakeHit;
+        damageable.onDeath += OnDeath;
     }
 
     void Update()
     {
-        if (isRolling) return; // trava tudo durante o roll
-
-        Jump();
+        if (isDead || isRolling) return;
 
         float moveInput = Input.GetAxisRaw("Horizontal");
+        bool wantsToJump = Input.GetKey(KeyCode.Space);
+        bool wantsToAttack = Input.GetMouseButtonDown(0);
+        bool wantsToRoll = Input.GetKeyDown(KeyCode.LeftShift);
 
-        // Movimento lateral (somente se não estiver atacando)
-        if (!isAttacking)
-            rb.linearVelocity = new Vector2(moveInput * speed, rb.linearVelocity.y);
+        if (!isAttacking) timeSinceAttack += Time.deltaTime;
 
-        // Flip do sprite
-        if (moveInput != 0)
-            spriteRenderer.flipX = moveInput < 0;
+        // Atualiza lastMoveTime se houver movimento
+        if (moveInput != 0 || wantsToJump || wantsToRoll)
+            lastMoveTime = Time.time;
 
-        // Ataque com botão esquerdo do mouse
-        if (!isAttacking)
-            timezin += Time.deltaTime;
+        if (wantsToAttack && isGrounded && !isRolling) Attack();
 
-        if (Input.GetMouseButtonDown(0) && isGrounded && !isRolling)
-        {
-            Attack();
-        }
+        if (!isAttacking) rb.linearVelocity = new Vector2(moveInput * speed, rb.linearVelocity.y);
+        if (wantsToJump) Jump();
+        if (wantsToRoll && isGrounded && !isAttacking) StartCoroutine(Roll());
+        if (moveInput != 0 && !isAttacking) sr.flipX = moveInput < 0;
 
-        // Rolamento (Shift)
-        if (Input.GetKeyDown(KeyCode.LeftShift) && isGrounded && !isAttacking && !isJumping)
-        {
-            StartCoroutine(Roll());
-        }
-
-        // Atualiza parâmetros do Animator
-        animator.SetBool("isGrounded", isGrounded);
-        animator.SetBool("isRunning", moveInput != 0 && isGrounded && !isRolling);
-        animator.SetBool("isJumping", !isGrounded);
-        verticalVelocity = rb.linearVelocity.y;
-        animator.SetBool("isFalling", verticalVelocity < 0);
-        animator.SetFloat("verticalVelocity", rb.linearVelocity.y);
-        animator.SetInteger("comboStep", comboStep);
+        anim.SetBool("isAttacking", isAttacking);
+        anim.SetBool("isGrounded", isGrounded);
+        anim.SetBool("isRunning", moveInput != 0 && isGrounded && !isRolling && !isAttacking);
+        anim.SetBool("isJumping", !isGrounded);
     }
 
     void Jump()
     {
-        if (Input.GetKey(KeyCode.Space) && isGrounded && !isRolling)
+        if (isGrounded && !isRolling)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-            animator.SetBool("isJumping", true);
-            animator.SetBool("isGrounded", false);
-            isJumping = true;
+            anim.SetTrigger("Jump");
         }
     }
 
     void Attack()
     {
         if (isAttacking || isRolling) return;
-
         isAttacking = true;
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-        animator.SetBool("isRunning", false);
 
-        if (timezin < 1.0f)
-        {
-            comboStep++;
-        }
-        else
-        {
-            comboStep = 1;
-        }
+        comboStep = (timeSinceAttack < 1f) ? comboStep + 1 : 1;
+        if (comboStep > 2) comboStep = 1;
+        anim.SetInteger("comboStep", comboStep);
+        timeSinceAttack = 0f;
 
-        if (comboStep > 2)
-            comboStep = 1;
-
-        animator.SetBool("isAttacking", true);
-        animator.SetInteger("comboStep", comboStep);
-        timezin = 0f;
-
-        Debug.Log("Atacando passo " + comboStep);
+        RotateHitbox(hitbox);
     }
 
-    public void EndAttack()
+    private void RotateHitbox(GameObject hb)
     {
-        isAttacking = false;
-        animator.SetBool("isAttacking", false);
-        Debug.Log("Fim do ataque");
-
-        if (timezin > 1.0f)
-        {
-            comboStep = 0;
-            animator.SetInteger("comboStep", 0);
-        }
+        if (hb == null) return;
+        Vector3 scale = hb.transform.localScale;
+        scale.x = Mathf.Abs(scale.x) * (sr.flipX ? -1 : 1);
+        hb.transform.localScale = scale;
     }
+
+    public void EndAttack() => isAttacking = false;
 
     public void EnableHitbox()
     {
-        hitbox.SetActive(true);
+        if (hitbox != null)
+        {
+            hasHitThisActivation = false;
+            hitbox.SetActive(true);
+            StartCoroutine(ResetHitbox(hitbox));
+        }
+    }
+
+    private IEnumerator ResetHitbox(GameObject hb)
+    {
+        yield return new WaitForSeconds(0.1f);
+        hb.SetActive(false);
     }
 
     public void DisableHitbox()
     {
-        hitbox.SetActive(false);
+        if (hitbox != null) hitbox.SetActive(false);
     }
 
-    // ---- ROLAMENTO ----
     private IEnumerator Roll()
     {
         isRolling = true;
-        canTakeDamage = false;
-        animator.SetBool("isRolling", true);
+        anim.SetBool("isRolling", true);
 
-        float direction = spriteRenderer.flipX ? -1 : 1;
-        rb.linearVelocity = new Vector2(direction * rollForce, 0);
+        float dir = sr.flipX ? -1 : 1;
+        rb.linearVelocity = new Vector2(dir * rollForce, 0);
 
-        // Espera até a animação acabar ou até o tempo máximo
-        float elapsed = 0f;
-        while (elapsed < rollDuration)
-        {
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
+        yield return new WaitForSeconds(rollDuration);
 
-        EndRoll();
-    }
-
-
-    public void EndRoll()
-    {
         isRolling = false;
-        canTakeDamage = true;
-        animator.SetBool("isRolling", false);
-        Debug.Log("Fim do rolamento");
+        anim.SetBool("isRolling", false);
     }
 
-
-    void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("ground"))
-        {
-            isGrounded = true;
-            isJumping = false;
-        }
+        if (collision.gameObject.CompareTag("ground")) isGrounded = true;
     }
 
-    void OnCollisionExit2D(Collision2D collision)
+    private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("ground"))
-            isGrounded = false;
+        if (collision.gameObject.CompareTag("ground")) isGrounded = false;
     }
+
+    private void OnTakeHit(float dmg)
+    {
+        if (isDead) return;
+        anim.SetTrigger("TakeHit");
+    }
+
+    private void OnDeath()
+    {
+        if (isDead) return;
+        isDead = true;
+        this.enabled = false;
+    }
+
+    public bool CanTakeDamage() => Time.time - lastMoveTime <= activeDamageDuration;
 }

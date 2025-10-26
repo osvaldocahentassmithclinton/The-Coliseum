@@ -2,22 +2,21 @@ using UnityEngine;
 
 public class CharacterSpawner : MonoBehaviour
 {
+    // Este prefab será o ÚNICO que este script pode spawnar.
+    [Header("Prefab do personagem a spawnar")]
+    public GameObject characterPrefab;
+
     void Start()
     {
-        string characterName = CharacterSelectionManager.selectedCharacter;
-
-        if (!string.IsNullOrEmpty(characterName))
+        if (characterPrefab != null)
         {
-            GameObject prefab = Resources.Load<GameObject>("Characters/" + characterName);
-            if (prefab != null)
-            {
-                Instantiate(prefab, transform.position, Quaternion.identity);
-            }
-            else
-            {
-                Debug.LogError("Prefab não encontrado: " + characterName);
-            }
+            // AQUI você spawna o personagem na posição deste GameObject
+            Instantiate(characterPrefab, transform.position, Quaternion.identity);
+        }
+        else
+        {
+            // Este erro aponta que o campo 'characterPrefab' está vazio no Inspector
+            Debug.LogError("Nenhum prefab de personagem atribuído!");
         }
     }
 }
-
