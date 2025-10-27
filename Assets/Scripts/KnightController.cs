@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using System;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(Animator), typeof(Damageable))]
 public class KnightController : MonoBehaviour
@@ -14,11 +13,7 @@ public class KnightController : MonoBehaviour
 
     [Header("Combate")]
     [SerializeField] private GameObject hitbox;
-    [SerializeField] private string hitboxChildName = "AttackHitbox";
-
-    [Header("Dano pós-movimento")]
-    public float activeDamageDuration = 2f;
-    private float lastMoveTime;
+    [SerializeField] private string hitboxChildName = "AttackHitbox"; // Nome para busca automática
 
     private Rigidbody2D rb;
     private Animator anim;
@@ -33,7 +28,6 @@ public class KnightController : MonoBehaviour
     private int comboStep;
 
     private int selfLayerID;
-    private bool hasHitThisActivation = false;
 
     void Start()
     {
@@ -49,7 +43,9 @@ public class KnightController : MonoBehaviour
         {
             Transform childTransform = transform.Find(hitboxChildName);
             if (childTransform != null)
+            {
                 hitbox = childTransform.gameObject;
+            }
         }
 
         if (hitbox) hitbox.SetActive(false);
@@ -67,18 +63,23 @@ public class KnightController : MonoBehaviour
         bool wantsToAttack = Input.GetMouseButtonDown(0);
         bool wantsToRoll = Input.GetKeyDown(KeyCode.LeftShift);
 
-        if (!isAttacking) timeSinceAttack += Time.deltaTime;
+        if (!isAttacking)
+            timeSinceAttack += Time.deltaTime;
 
-        // Atualiza lastMoveTime se houver movimento
-        if (moveInput != 0 || wantsToJump || wantsToRoll)
-            lastMoveTime = Time.time;
+        if (wantsToAttack && isGrounded && !isRolling)
+            Attack();
 
-        if (wantsToAttack && isGrounded && !isRolling) Attack();
+        if (!isAttacking)
+            rb.linearVelocity = new Vector2(moveInput * speed, rb.linearVelocity.y);
 
-        if (!isAttacking) rb.linearVelocity = new Vector2(moveInput * speed, rb.linearVelocity.y);
-        if (wantsToJump) Jump();
-        if (wantsToRoll && isGrounded && !isAttacking) StartCoroutine(Roll());
-        if (moveInput != 0 && !isAttacking) sr.flipX = moveInput < 0;
+        if (wantsToJump)
+            Jump();
+
+        if (wantsToRoll && isGrounded && !isAttacking)
+            StartCoroutine(Roll());
+
+        if (moveInput != 0 && !isAttacking)
+            sr.flipX = moveInput < 0;
 
         anim.SetBool("isAttacking", isAttacking);
         anim.SetBool("isGrounded", isGrounded);
@@ -98,41 +99,81 @@ public class KnightController : MonoBehaviour
     void Attack()
     {
         if (isAttacking || isRolling) return;
+
         isAttacking = true;
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
 
         comboStep = (timeSinceAttack < 1f) ? comboStep + 1 : 1;
         if (comboStep > 2) comboStep = 1;
+
         anim.SetInteger("comboStep", comboStep);
         timeSinceAttack = 0f;
 
+        // gira a hitbox visualmente para acompanhar o flip
         RotateHitbox(hitbox);
     }
 
-    private void RotateHitbox(GameObject hb)
+    private void RotateHitbox(GameObject hitboxObject)
     {
-        if (hb == null) return;
-        Vector3 scale = hb.transform.localScale;
+        if (hitboxObject == null) return;
+
+        Vector3 scale = hitboxObject.transform.localScale;
         scale.x = Mathf.Abs(scale.x) * (sr.flipX ? -1 : 1);
-        hb.transform.localScale = scale;
+        hitboxObject.transform.localScale = scale;
     }
 
     public void EndAttack() => isAttacking = false;
 
+    // EnableHitbox com Overlap imediato
     public void EnableHitbox()
     {
-        if (hitbox != null)
+        if (hitbox == null) return;
+
+        Collider2D hbCol = hitbox.GetComponent<Collider2D>();
+        DamageDealer dd = hitbox.GetComponent<DamageDealer>();
+        float dmgValue = (dd != null) ? dd.damage : 10f;
+
+        hitbox.SetActive(true);
+
+        if (hbCol != null)
         {
-            hasHitThisActivation = false;
-            hitbox.SetActive(true);
-            StartCoroutine(ResetHitbox(hitbox));
+            hbCol.enabled = true;
+
+            ContactFilter2D filter = new ContactFilter2D();
+            filter.useTriggers = true;
+            Collider2D[] results = new Collider2D[10];
+            int hits = hbCol.Overlap(filter, results);
+
+            for (int i = 0; i < hits; i++)
+            {
+                Collider2D other = results[i];
+                if (other == null) continue;
+                if (other.gameObject == gameObject) continue;
+                if (other.gameObject.layer == gameObject.layer) continue;
+
+                Damageable tgt = other.GetComponent<Damageable>();
+                if (tgt != null)
+                {
+                    tgt.TakeDamage(dmgValue);
+                }
+            }
+
+            // para evitar duplicação via física
+            hbCol.enabled = false;
         }
+
+        StartCoroutine(ResetHitbox(hitbox));
     }
 
     private IEnumerator ResetHitbox(GameObject hb)
     {
-        yield return new WaitForSeconds(0.1f);
-        hb.SetActive(false);
+        yield return new WaitForSeconds(0.12f);
+        if (hb != null)
+        {
+            Collider2D col = hb.GetComponent<Collider2D>();
+            if (col != null) col.enabled = false;
+            hb.SetActive(false);
+        }
     }
 
     public void DisableHitbox()
@@ -156,12 +197,14 @@ public class KnightController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("ground")) isGrounded = true;
+        if (collision.gameObject.CompareTag("ground"))
+            isGrounded = true;
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("ground")) isGrounded = false;
+        if (collision.gameObject.CompareTag("ground"))
+            isGrounded = false;
     }
 
     private void OnTakeHit(float dmg)
@@ -176,6 +219,4 @@ public class KnightController : MonoBehaviour
         isDead = true;
         this.enabled = false;
     }
-
-    public bool CanTakeDamage() => Time.time - lastMoveTime <= activeDamageDuration;
 }

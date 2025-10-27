@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using System;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(Animator), typeof(Damageable))]
 public class ElfController : MonoBehaviour
@@ -20,6 +19,11 @@ public class ElfController : MonoBehaviour
     public float slideSpeed = 10f;
     public float slideDuration = 0.75f;
 
+    private bool isGrounded = true;
+    private bool isSliding = false;
+    private bool isAttacking = false;
+    private bool isDead = false;
+
     [Header("Ataques e Projétil")]
     public GameObject attack1Hitbox;
     public GameObject attack3Hitbox;
@@ -32,18 +36,6 @@ public class ElfController : MonoBehaviour
     public Transform projectileSpawnPoint;
     public float projectileSpeed = 10f;
 
-    [Header("Dano pós-movimento")]
-    public float activeDamageDuration = 2f; // tempo em que pode levar dano após mover
-    private float lastMoveTime;
-
-    private bool isGrounded = true;
-    private bool isSliding = false;
-    private bool isAttacking = false;
-    private bool isDead = false;
-
-    private bool hasHitAttack1 = false;
-    private bool hasHitAttack3 = false;
-
     void Start()
     {
         anim = GetComponent<Animator>();
@@ -53,8 +45,10 @@ public class ElfController : MonoBehaviour
 
         selfLayerID = gameObject.layer;
 
-        if (attack1Hitbox == null) attack1Hitbox = FindChildByName("Attack1_Hitbox");
-        if (attack3Hitbox == null) attack3Hitbox = FindChildByName("Attack3_Hitbox");
+        if (attack1Hitbox == null)
+            attack1Hitbox = FindChildByName("Attack1_Hitbox");
+        if (attack3Hitbox == null)
+            attack3Hitbox = FindChildByName("Attack3_Hitbox");
 
         if (attack1Hitbox) attack1Hitbox.SetActive(false);
         if (attack3Hitbox) attack3Hitbox.SetActive(false);
@@ -77,10 +71,6 @@ public class ElfController : MonoBehaviour
         if (isDead) return;
 
         float move = Input.GetAxisRaw("Horizontal");
-
-        // Atualiza lastMoveTime se houver movimento
-        if (move != 0 || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.LeftShift))
-            lastMoveTime = Time.time;
 
         // Movimento
         if (!isAttacking && !isSliding)
@@ -121,7 +111,7 @@ public class ElfController : MonoBehaviour
         if (!isAttacking && isGrounded && !isSliding)
         {
             if (Input.GetKeyDown(KeyCode.Z)) Attack("Attack1");
-            else if (Input.GetKeyDown(KeyCode.X)) Attack("Attack2");
+            else if (Input.GetKeyDown(KeyCode.X)) Attack("Attack2"); // <-- NÃO chama ShootProjectile() aqui
             else if (Input.GetKeyDown(KeyCode.C)) Attack("Attack3");
         }
 
@@ -165,32 +155,72 @@ public class ElfController : MonoBehaviour
         isAttacking = true;
         anim.SetTrigger(attackName);
 
-        if (attackName == "Attack2")
-            ShootProjectile();
+        // OBS: ShootProjectile deve ser chamado por Animation Event (ex: "ShootProjectile")
     }
 
     public void EndAttack() => isAttacking = false;
 
+    // ============================
+    // EnableHitbox agora aplica dano imediatamente via OverlapCollider
+    // ============================
     public void EnableHitbox(string hitboxName)
     {
-        if (hitboxName == "Attack1" && attack1Hitbox != null)
+        GameObject hb = null;
+        if (hitboxName == "Attack1" && attack1Hitbox != null) hb = attack1Hitbox;
+        else if (hitboxName == "Attack3" && attack3Hitbox != null) hb = attack3Hitbox;
+
+        if (hb == null) return;
+
+        Collider2D hbCol = hb.GetComponent<Collider2D>();
+        DamageDealer dd = hb.GetComponent<DamageDealer>();
+        float dmgValue = (dd != null) ? dd.damage : 10f;
+
+        // Ativa visualmente a hitbox
+        hb.SetActive(true);
+
+        if (hbCol != null)
         {
-            hasHitAttack1 = false;
-            attack1Hitbox.SetActive(true);
-            StartCoroutine(ResetHitbox(attack1Hitbox));
+            // Temporariamente garante que o collider esteja ativo para OverlapCollider
+            hbCol.enabled = true;
+
+            // Faz a checagem imediata de colisões com a hitbox
+            ContactFilter2D filter = new ContactFilter2D();
+            filter.useTriggers = true;
+            Collider2D[] results = new Collider2D[10];
+            int hits = hbCol.Overlap(filter, results);
+
+            for (int i = 0; i < hits; i++)
+            {
+                Collider2D other = results[i];
+                if (other == null) continue;
+                if (other.gameObject == gameObject) continue; // ignora a si mesmo
+                if (other.gameObject.layer == gameObject.layer) continue; // friendly fire ignore
+
+                Damageable tgt = other.GetComponent<Damageable>();
+                if (tgt != null)
+                {
+                    tgt.TakeDamage(dmgValue);
+                }
+            }
+
+            // desativa o collider para evitar que o sistema de física gere eventos duplicados
+            hbCol.enabled = false;
         }
-        else if (hitboxName == "Attack3" && attack3Hitbox != null)
-        {
-            hasHitAttack3 = false;
-            attack3Hitbox.SetActive(true);
-            StartCoroutine(ResetHitbox(attack3Hitbox));
-        }
+
+        // E fecha a hitbox após um curto tempo (caso alguma animação precise)
+        StartCoroutine(ResetHitbox(hb));
     }
 
     private IEnumerator ResetHitbox(GameObject hitbox)
     {
-        yield return new WaitForSeconds(0.1f);
-        hitbox.SetActive(false);
+        yield return new WaitForSeconds(0.12f);
+        if (hitbox != null)
+        {
+            // garante collider desligado e objeto desativado
+            Collider2D col = hitbox.GetComponent<Collider2D>();
+            if (col != null) col.enabled = false;
+            hitbox.SetActive(false);
+        }
     }
 
     public void DisableHitbox(string hitboxName)
@@ -221,7 +251,10 @@ public class ElfController : MonoBehaviour
             arrow.SetDirection(direction, gameObject);
     }
 
-    private void OnTakeHit(float dmg) => anim.SetTrigger("TakeHit");
+    private void OnTakeHit(float dmg)
+    {
+        anim.SetTrigger("TakeHit");
+    }
 
     private void OnDeath()
     {
@@ -229,8 +262,6 @@ public class ElfController : MonoBehaviour
         isDead = true;
         this.enabled = false;
     }
-
-    public bool CanTakeDamage() => Time.time - lastMoveTime <= activeDamageDuration;
 
     private void OnDrawGizmosSelected()
     {

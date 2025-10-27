@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D), typeof(DamageDealer))]
 public class ProjectileArrow : MonoBehaviour
@@ -11,10 +10,10 @@ public class ProjectileArrow : MonoBehaviour
     private Collider2D projectileCollider;
 
     private float direction = 1f;
-    private bool hasHit = false; // <- controla se a flecha já deu dano ou colidiu
+    private bool hasHit = false;
     private bool isFading = false;
 
-    private GameObject shooter; // Para evitar Friendly Fire
+    private GameObject shooter; // dono da flecha
 
     [Header("Configurações da Flecha")]
     public float speed = 10f;
@@ -41,6 +40,7 @@ public class ProjectileArrow : MonoBehaviour
         Destroy(gameObject, lifeTime);
     }
 
+    // Chamado pelo controller do elfo
     public void SetDirection(float dir, GameObject owner)
     {
         direction = dir;
@@ -64,29 +64,36 @@ public class ProjectileArrow : MonoBehaviour
     {
         if (isFading || hasHit) return;
 
+        // evita acertar o próprio atirador
         if (shooter != null && other.gameObject == shooter) return;
 
-        Damageable targetDamageable = other.GetComponent<Damageable>();
-
-        if (targetDamageable != null)
+        // tenta pegar Damageable
+        Damageable target = other.GetComponent<Damageable>();
+        if (target != null)
         {
-            if (other.gameObject.layer == gameObject.layer) return; // ignora aliados
+            // evita friendly fire por layer
+            if (other.gameObject.layer == gameObject.layer) return;
 
-            targetDamageable.TakeDamage(dmgDealer.damage);
+            // aplica dano através do Damageable (que já tem invulnerabilidade)
+            if (dmgDealer != null)
+                target.TakeDamage(dmgDealer.damage);
 
-            hasHit = true; // marca que já acertou algo
-            projectileCollider.enabled = false; // impede múltiplos hits
+            hasHit = true;
+
+            // desativa o colisor para prevenir múltiplos hits
+            if (projectileCollider != null)
+                projectileCollider.enabled = false;
 
             StartCoroutine(HandleEnemyHit());
+            return;
         }
-        else
+
+        // se bateu em parede
+        int layer = other.gameObject.layer;
+        if (((1 << layer) & wallLayer) != 0)
         {
-            int layer = other.gameObject.layer;
-            if (((1 << layer) & wallLayer) != 0)
-            {
-                hasHit = true; // marca que bateu na parede
-                StartCoroutine(HandleWallCollision());
-            }
+            hasHit = true;
+            StartCoroutine(HandleWallCollision());
         }
     }
 

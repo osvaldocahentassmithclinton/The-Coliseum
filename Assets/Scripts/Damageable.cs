@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
+using System.Collections;
 
-[RequireComponent(typeof(Collider2D))]
 public class Damageable : MonoBehaviour
 {
     public Action onDeath;
@@ -12,79 +12,105 @@ public class Damageable : MonoBehaviour
     private float currentHealth;
     private bool isDead = false;
 
-    [Header("Dano")]
-    public float damageCooldown = 0.3f; // tempo entre hits
-    private float lastDamageTime = -999f;
+    [Header("Invulnerabilidade")]
+    public float invulnerabilityDuration = 1.2f; // 1.0 - 1.5s recomendado
+    private bool isInvulnerable = false;
 
-    [Header("Referências")]
-    public GameObject opponent; // referência a outro personagem ou inimigo
-
-    [Header("Vulnerabilidade pós-movimento")]
-    public float vulnerableTimeAfterMove = 2f; // segundos que pode levar dano após se mover
-    private float lastMoveTime = -999f;
+    [Header("Referï¿½ncias")]
+    public GameObject opponent; // usado pelo GameManager (mantenha)
 
     private Animator anim;
+    private SpriteRenderer spriteRenderer;
 
     private void Start()
     {
         currentHealth = maxHealth;
         anim = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    private void Update()
+    // Usamos OnTriggerEnter2D para detectar ataques quando a hitbox/projï¿½til entra em contato
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        // Atualiza lastMoveTime se o player se moveu
-        var elf = GetComponent<ElfController>();
-        if (elf != null && (Mathf.Abs(Input.GetAxisRaw("Horizontal")) > 0 || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.LeftShift)))
-            lastMoveTime = Time.time;
+        if (isDead) return;
 
-        var knight = GetComponent<KnightController>();
-        if (knight != null && (Mathf.Abs(Input.GetAxisRaw("Horizontal")) > 0 || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.LeftShift)))
-            lastMoveTime = Time.time;
-    }
-
-    private void OnTriggerStay2D(Collider2D other)
-    {
+        // Procura DamageDealer (hitbox ou projï¿½til)
         DamageDealer dmgDealer = other.GetComponent<DamageDealer>();
-        if (dmgDealer == null || isDead) return;
+        if (dmgDealer == null) return;
 
-        // Evita friendly fire
-        if (other.gameObject.layer == gameObject.layer)
-            return;
+        // Friendly fire: ignora se mesma layer
+        if (other.gameObject.layer == gameObject.layer) return;
 
-        // Aplica dano apenas se cooldown expirou
-        if (Time.time - lastDamageTime < damageCooldown)
-            return;
+        // Se estamos invulnerï¿½veis, nï¿½o aplicamos dano agora
+        if (isInvulnerable) return;
 
-        // Só leva dano se estiver dentro do tempo de vulnerabilidade após se mover
-        if (Time.time - lastMoveTime > vulnerableTimeAfterMove)
-            return;
-
-        lastDamageTime = Time.time;
+        // Aplica dano
         TakeDamage(dmgDealer.damage);
+
+        // Para projï¿½teis/objetos que devam se desativar ao acertar, deixe que
+        // o prï¿½prio script do projï¿½til (ex: ProjectileArrow) trate do colisor.
     }
 
     public void TakeDamage(float dmg)
     {
         if (isDead) return;
+        if (isInvulnerable) return;
 
         currentHealth -= dmg;
         Debug.Log($"{gameObject.name} recebeu {dmg} de dano! Vida restante: {currentHealth}");
 
-        onHit?.Invoke(dmg);
+        // Notifica listeners
+        if (onHit != null) onHit(dmg);
+
+        // Comeï¿½a invulnerabilidade + piscada
+        StartCoroutine(InvulnerabilityCoroutine());
 
         if (currentHealth <= 0)
             Die();
     }
 
-    private void Die()
+    private IEnumerator InvulnerabilityCoroutine()
+    {
+        isInvulnerable = true;
+
+        // piscagem simples: alterna alfa entre 1 e 0.25 vï¿½rias vezes
+        if (spriteRenderer != null)
+        {
+            float elapsed = 0f;
+            float blinkInterval = 0.12f;
+            Color original = spriteRenderer.color;
+            while (elapsed < invulnerabilityDuration)
+            {
+                // diminuir alpha
+                spriteRenderer.color = new Color(original.r, original.g, original.b, 0.25f);
+                yield return new WaitForSeconds(blinkInterval);
+                elapsed += blinkInterval;
+
+                // restaurar alpha
+                spriteRenderer.color = new Color(original.r, original.g, original.b, 1f);
+                yield return new WaitForSeconds(blinkInterval);
+                elapsed += blinkInterval;
+            }
+            // restaura cor original
+            spriteRenderer.color = original;
+        }
+        else
+        {
+            // fallback: sï¿½ espera o tempo
+            yield return new WaitForSeconds(invulnerabilityDuration);
+        }
+
+        isInvulnerable = false;
+    }
+
+    public void Die()
     {
         if (isDead) return;
         isDead = true;
 
         Debug.Log($"{gameObject.name} morreu!");
 
-        onDeath?.Invoke();
+        if (onDeath != null) onDeath();
 
         if (anim != null)
             anim.SetTrigger("Death");
