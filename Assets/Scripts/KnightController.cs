@@ -109,7 +109,6 @@ public class KnightController : MonoBehaviour
         anim.SetInteger("comboStep", comboStep);
         timeSinceAttack = 0f;
 
-        // gira a hitbox visualmente para acompanhar o flip
         RotateHitbox(hitbox);
     }
 
@@ -158,7 +157,6 @@ public class KnightController : MonoBehaviour
                 }
             }
 
-            // para evitar duplicação via física
             hbCol.enabled = false;
         }
 
@@ -186,6 +184,10 @@ public class KnightController : MonoBehaviour
         isRolling = true;
         anim.SetBool("isRolling", true);
 
+        // <-- Ativa invulnerabilidade durante o roll
+        if (damageable != null)
+            damageable.SetInvulnerable(true);
+
         float dir = sr.flipX ? -1 : 1;
         rb.linearVelocity = new Vector2(dir * rollForce, 0);
 
@@ -193,6 +195,10 @@ public class KnightController : MonoBehaviour
 
         isRolling = false;
         anim.SetBool("isRolling", false);
+
+        // <-- Desativa invulnerabilidade ao final
+        if (damageable != null)
+            damageable.SetInvulnerable(false);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

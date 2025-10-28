@@ -172,20 +172,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11d637fcf08713748aa11357548c52e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 100
+  speed: 50
   lifeTime: 10
   stickDuration: 3
   fadeDuration: 1.5
-  damage: 10
   wallLayer:
     serializedVersion: 2
     m_Bits: 1048576
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 1
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 1
 --- !u!50 &3758569935231424291
 Rigidbody2D:
   serializedVersion: 5
@@ -226,4 +219,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 10
+  targetTag: 
+  destroyAfterTime: 0
   lifeTime: 10

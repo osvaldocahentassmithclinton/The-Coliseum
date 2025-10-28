@@ -106,7 +106,7 @@ public class ElfController : MonoBehaviour
             Jump();
 
         if (Input.GetKeyDown(KeyCode.LeftShift) && isGrounded && !isAttacking && !isSliding)
-            StartCoroutine(SlideCoroutine());
+            StartCoroutine(SlideCoroutine()); // <-- agora o slide dá invulnerabilidade
 
         if (!isAttacking && isGrounded && !isSliding)
         {
@@ -136,6 +136,10 @@ public class ElfController : MonoBehaviour
         isSliding = true;
         anim.SetBool("isSliding", true);
 
+        // <-- Ativa invulnerabilidade no slide
+        if (damageable != null)
+            damageable.SetInvulnerable(true);
+
         float startTime = Time.time;
         float direction = sr.flipX ? -1f : 1f;
 
@@ -148,6 +152,10 @@ public class ElfController : MonoBehaviour
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         isSliding = false;
         anim.SetBool("isSliding", false);
+
+        // <-- Desativa invulnerabilidade após o slide
+        if (damageable != null)
+            damageable.SetInvulnerable(false);
     }
 
     void Attack(string attackName)
@@ -161,7 +169,7 @@ public class ElfController : MonoBehaviour
     public void EndAttack() => isAttacking = false;
 
     // ============================
-    // EnableHitbox agora aplica dano imediatamente via OverlapCollider
+    // EnableHitbox aplica dano imediatamente via OverlapCollider
     // ============================
     public void EnableHitbox(string hitboxName)
     {
@@ -175,15 +183,12 @@ public class ElfController : MonoBehaviour
         DamageDealer dd = hb.GetComponent<DamageDealer>();
         float dmgValue = (dd != null) ? dd.damage : 10f;
 
-        // Ativa visualmente a hitbox
         hb.SetActive(true);
 
         if (hbCol != null)
         {
-            // Temporariamente garante que o collider esteja ativo para OverlapCollider
             hbCol.enabled = true;
 
-            // Faz a checagem imediata de colisões com a hitbox
             ContactFilter2D filter = new ContactFilter2D();
             filter.useTriggers = true;
             Collider2D[] results = new Collider2D[10];
@@ -193,21 +198,17 @@ public class ElfController : MonoBehaviour
             {
                 Collider2D other = results[i];
                 if (other == null) continue;
-                if (other.gameObject == gameObject) continue; // ignora a si mesmo
-                if (other.gameObject.layer == gameObject.layer) continue; // friendly fire ignore
+                if (other.gameObject == gameObject) continue;
+                if (other.gameObject.layer == gameObject.layer) continue;
 
                 Damageable tgt = other.GetComponent<Damageable>();
                 if (tgt != null)
-                {
                     tgt.TakeDamage(dmgValue);
-                }
             }
 
-            // desativa o collider para evitar que o sistema de física gere eventos duplicados
             hbCol.enabled = false;
         }
 
-        // E fecha a hitbox após um curto tempo (caso alguma animação precise)
         StartCoroutine(ResetHitbox(hb));
     }
 
@@ -216,7 +217,6 @@ public class ElfController : MonoBehaviour
         yield return new WaitForSeconds(0.12f);
         if (hitbox != null)
         {
-            // garante collider desligado e objeto desativado
             Collider2D col = hitbox.GetComponent<Collider2D>();
             if (col != null) col.enabled = false;
             hitbox.SetActive(false);

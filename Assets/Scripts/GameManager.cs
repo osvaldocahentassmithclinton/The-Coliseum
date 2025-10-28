@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using System;
 
 public class GameManager : MonoBehaviour
 {
@@ -24,18 +23,17 @@ public class GameManager : MonoBehaviour
     [Tooltip("ID numérico da Layer de Colisão do Player 2 (Ex: 9). Digite o número.")]
     public int player2Layer = 9;
 
+    [Header("UI")]
+    public HealthBar player1HealthBar; // arrastar referência no inspector
+    public HealthBar player2HealthBar; // arrastar referência no inspector
 
     private GameObject player1;
     private GameObject player2;
 
-    // (Assumindo que CharacterSelectionManager.selectedCharacterP1 existe de outra cena)
-    // Se não existir, use constantes para teste:
-    // public static string selectedCharacterP1 = "Knight"; 
-    // public static string selectedCharacterP2 = "Elf";
+    private bool gameEnded = false;
 
     private void Start()
     {
-        // Exemplo: Substitua pela sua lógica de seleção, se necessário.
         string p1Name = CharacterSelectionManager.selectedCharacterP1;
         string p2Name = CharacterSelectionManager.selectedCharacterP2;
 
@@ -45,7 +43,6 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // Chama o SpawnCharacter passando o ID da Layer correta
         player1 = SpawnCharacter(p1Name, player1Spawn.position, false, player1Layer);
         player2 = SpawnCharacter(p2Name, player2Spawn.position, true, player2Layer);
 
@@ -55,7 +52,6 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // Define Tags e Opponent
         player1.tag = "Player1";
         player2.tag = "Player2";
 
@@ -63,6 +59,17 @@ public class GameManager : MonoBehaviour
         var dmg2 = player2.GetComponent<Damageable>();
         if (dmg1 != null) dmg1.opponent = player2;
         if (dmg2 != null) dmg2.opponent = player1;
+
+        // Vincula as HealthBars (se atribuídas no Inspector)
+        if (player1HealthBar != null && dmg1 != null)
+            player1HealthBar.target = dmg1;
+
+        if (player2HealthBar != null && dmg2 != null)
+            player2HealthBar.target = dmg2;
+
+        // Inscreve eventos de morte para checar fim de jogo
+        if (dmg1 != null) dmg1.onDeath += () => OnCharacterDeath(1);
+        if (dmg2 != null) dmg2.onDeath += () => OnCharacterDeath(2);
     }
 
     private GameObject SpawnCharacter(string name, Vector3 position, bool flip, int layerID)
@@ -73,7 +80,6 @@ public class GameManager : MonoBehaviour
             {
                 GameObject obj = Instantiate(cp.prefab, position, Quaternion.identity);
 
-                // Aplica a Layer a todos os filhos do personagem (IMPORTANTE para hitboxes e projéteis)
                 SetLayerRecursively(obj, layerID);
 
                 var sr = obj.GetComponent<SpriteRenderer>();
@@ -88,7 +94,6 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
-    // Método auxiliar para aplicar a Layer recursivamente a todos os filhos
     private void SetLayerRecursively(GameObject obj, int newLayer)
     {
         if (obj == null) return;
@@ -99,5 +104,54 @@ public class GameManager : MonoBehaviour
             if (child == null) continue;
             SetLayerRecursively(child.gameObject, newLayer);
         }
+    }
+
+    private void OnCharacterDeath(int playerIndex)
+    {
+        if (gameEnded) return;
+
+        // Checa estado das duas entidades
+        var dmg1 = player1 != null ? player1.GetComponent<Damageable>() : null;
+        var dmg2 = player2 != null ? player2.GetComponent<Damageable>() : null;
+
+        bool p1Dead = dmg1 == null ? true : dmg1.IsDead;
+        bool p2Dead = dmg2 == null ? true : dmg2.IsDead;
+
+        if (p1Dead && p2Dead)
+        {
+            EndGame("DRAW");
+        }
+        else if (p1Dead)
+        {
+            EndGame("P2 WINS");
+        }
+        else if (p2Dead)
+        {
+            EndGame("P1 WINS");
+        }
+    }
+
+    private void EndGame(string message)
+    {
+        gameEnded = true;
+        Time.timeScale = 0f;
+
+        if (UIManager.Instance != null)
+            UIManager.Instance.ShowEndGameScreen(message);
+
+        Debug.Log("Fim de jogo: " + message);
+    }
+
+    // Métodos públicos ligados aos botões (no UIManager/na cena)
+    public void GoToMainMenu()
+    {
+        Time.timeScale = 1f;
+        // SceneManager.LoadScene("MainMenu"); // descomente e coloque o nome correto
+    }
+
+    public void GoToCharacterSelect()
+    {
+        Time.timeScale = 1f;
+        // SceneManager.LoadScene("CharacterSelect"); // descomente e coloque o nome correto
     }
 }
