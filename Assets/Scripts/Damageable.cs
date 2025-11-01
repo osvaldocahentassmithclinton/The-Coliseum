@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic; // Adicionado para Ienumerable se necessário, mas não essencial.
 
 [RequireComponent(typeof(Animator))]
 public class Damageable : MonoBehaviour
@@ -11,6 +12,8 @@ public class Damageable : MonoBehaviour
     [Header("Vida")]
     public float maxHealth = 100f;
     private float currentHealth;
+    // Variável para armazenar a cor original do sprite. Crucial para restaurar no final.
+    private Color originalColor;
 
     public float CurrentHealth => currentHealth;
     public bool IsDead { get; private set; } = false;
@@ -35,15 +38,29 @@ public class Damageable : MonoBehaviour
         currentHealth = maxHealth;
         anim = GetComponent<Animator>();
 
+        // Tenta encontrar o SpriteRenderer de forma mais robusta
         sr = GetComponent<SpriteRenderer>();
-        if (sr == null) sr = GetComponentInChildren<SpriteRenderer>();
-        if (sr == null) Debug.LogWarning("Damageable: SpriteRenderer não encontrado!");
+        if (sr == null)
+        {
+            // Tenta nos filhos se não estiver no objeto principal
+            sr = GetComponentInChildren<SpriteRenderer>();
+        }
+
+        if (sr == null)
+        {
+            Debug.LogError($"Damageable no objeto {gameObject.name} não encontrou um SpriteRenderer! O efeito de piscar NÃO FUNCIONARÁ.");
+        }
+        else
+        {
+            // Salva a cor original antes de qualquer mudança
+            originalColor = sr.color;
+        }
     }
 
     public void TakeDamage(float dmg)
     {
         if (IsDead) return;
-        if (isInvulnerable) return;
+        if (isInvulnerable) return; // BLOQUEIA dano enquanto invulnerável
 
         currentHealth -= dmg;
         currentHealth = Mathf.Max(0f, currentHealth);
@@ -52,7 +69,9 @@ public class Damageable : MonoBehaviour
 
         onHit?.Invoke(dmg);
 
+        // Interrompe qualquer rotina de invulnerabilidade existente
         if (invulCoroutine != null) StopCoroutine(invulCoroutine);
+        // Inicia a nova rotina
         invulCoroutine = StartCoroutine(InvulnerabilityRoutine(invulnerabilityDuration));
 
         if (currentHealth <= 0f) Die();
@@ -65,6 +84,10 @@ public class Damageable : MonoBehaviour
 
         Debug.Log($"{gameObject.name} morreu!");
         onDeath?.Invoke();
+
+        // Garante que o piscar pare e a cor seja restaurada antes de morrer
+        if (invulCoroutine != null) StopCoroutine(invulCoroutine);
+        if (sr != null) sr.color = originalColor;
 
         if (anim != null)
             anim.SetTrigger("Death");
@@ -81,34 +104,39 @@ public class Damageable : MonoBehaviour
     }
 
     // ===========================
-    // COROUTINE DE INVULNERABILIDADE ATUALIZADA
+    // COROUTINE DE INVULNERABILIDADE (Piscar)
     // ===========================
     private IEnumerator InvulnerabilityRoutine(float duration)
     {
         isInvulnerable = true;
 
+        // Verifica a flag e se o SR existe
         if (flashWhileInvulnerable && sr != null)
         {
-            Color original = sr.color;
+            // Usa a cor original salva no Start()
             Color flashColor = Color.white;
-
             float timer = 0f;
-            float flashInterval = 0.1f; // tempo entre piscadas
+            float flashInterval = 0.05f; // Intervalo de tempo menor (mais rápido) para maior certeza visual
 
             while (timer < duration)
             {
+                // Liga o flash (Branco)
                 sr.color = flashColor;
                 yield return new WaitForSeconds(flashInterval);
-                sr.color = original;
+
+                // Desliga o flash (Cor Original)
+                sr.color = originalColor;
                 yield return new WaitForSeconds(flashInterval);
 
                 timer += flashInterval * 2f;
             }
 
-            sr.color = original;
+            // Garantia final: Restaura a cor original
+            sr.color = originalColor;
         }
         else
         {
+            // Se não for para piscar, apenas espera
             yield return new WaitForSeconds(duration);
         }
 
@@ -116,15 +144,20 @@ public class Damageable : MonoBehaviour
         invulCoroutine = null;
     }
 
+    // Métodos utilitários:
+
     public void SetInvulnerable(bool v)
     {
         if (v)
         {
+            // Se for invulnerável manualmente, para o piscar e mantém a flag
             if (invulCoroutine != null) StopCoroutine(invulCoroutine);
             isInvulnerable = true;
         }
         else
         {
+            // Ao desabilitar, garante que a cor seja restaurada
+            if (sr != null) sr.color = originalColor;
             isInvulnerable = false;
         }
     }

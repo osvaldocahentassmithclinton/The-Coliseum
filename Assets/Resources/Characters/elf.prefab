@@ -205,6 +205,7 @@ GameObject:
   - component: {fileID: 388654310560126726}
   - component: {fileID: 5284388467701414227}
   - component: {fileID: 4620016244458293575}
+  - component: {fileID: 6190686732193789914}
   m_Layer: 19
   m_Name: elf
   m_TagString: Player
@@ -413,8 +414,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
-  damageCooldown: 0.3
+  invulnerabilityDuration: 2
+  flashWhileInvulnerable: 1
   opponent: {fileID: 0}
+--- !u!114 &6190686732193789914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5666702232877693944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 299de101fed6bc54a9d241b785a52301, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerId: 0
 --- !u!1 &8656601750931557157
 GameObject:
   m_ObjectHideFlags: 0

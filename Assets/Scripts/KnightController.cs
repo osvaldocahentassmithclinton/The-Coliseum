@@ -20,6 +20,9 @@ public class KnightController : MonoBehaviour
     private SpriteRenderer sr;
     private Damageable damageable;
 
+    // CHANGED: PlayerInput reference
+    private PlayerInput playerInput; // CHANGED
+
     private float timeSinceAttack;
     private bool isGrounded;
     private bool isAttacking;
@@ -35,6 +38,11 @@ public class KnightController : MonoBehaviour
         anim = GetComponent<Animator>();
         sr = GetComponent<SpriteRenderer>();
         damageable = GetComponent<Damageable>();
+
+        // CHANGED: init PlayerInput
+        playerInput = GetComponent<PlayerInput>(); // CHANGED
+        if (playerInput == null)
+            Debug.LogWarning($"{name}: PlayerInput não encontrado. Adicione PlayerInput ao prefab e defina playerId."); // CHANGED
 
         selfLayerID = gameObject.layer;
         rb.gravityScale = gravityScale;
@@ -58,10 +66,11 @@ public class KnightController : MonoBehaviour
     {
         if (isDead || isRolling) return;
 
-        float moveInput = Input.GetAxisRaw("Horizontal");
-        bool wantsToJump = Input.GetKey(KeyCode.Space);
-        bool wantsToAttack = Input.GetMouseButtonDown(0);
-        bool wantsToRoll = Input.GetKeyDown(KeyCode.LeftShift);
+        // CHANGED: read inputs via playerInput with fallback
+        float moveInput = playerInput != null ? playerInput.GetHorizontal() : Input.GetAxisRaw("Horizontal"); // CHANGED
+        bool wantsToJump = playerInput != null ? playerInput.GetJumpDown() : Input.GetKey(KeyCode.Space); // CHANGED (note: GetJumpDown returns bool on button down)
+        bool wantsToAttack = playerInput != null ? playerInput.GetAction1Down() : Input.GetMouseButtonDown(0); // CHANGED
+        bool wantsToRoll = playerInput != null ? playerInput.GetDodgeDown() : Input.GetKeyDown(KeyCode.LeftShift); // CHANGED
 
         if (!isAttacking)
             timeSinceAttack += Time.deltaTime;

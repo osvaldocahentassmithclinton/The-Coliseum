@@ -10,6 +10,9 @@ public class ElfController : MonoBehaviour
     private SpriteRenderer sr;
     private int selfLayerID;
 
+    // CHANGED: referência ao PlayerInput
+    private PlayerInput playerInput; // CHANGED
+
     [Header("Configurações de Movimento")]
     public float speed = 5f;
     public float jumpForce = 8f;
@@ -45,6 +48,11 @@ public class ElfController : MonoBehaviour
 
         selfLayerID = gameObject.layer;
 
+        // CHANGED: pega PlayerInput no mesmo GameObject (mínima alteração)
+        playerInput = GetComponent<PlayerInput>(); // CHANGED
+        if (playerInput == null)
+            Debug.LogWarning($"{name}: PlayerInput não encontrado. Adicione PlayerInput ao prefab e defina playerId."); // CHANGED
+
         if (attack1Hitbox == null)
             attack1Hitbox = FindChildByName("Attack1_Hitbox");
         if (attack3Hitbox == null)
@@ -70,7 +78,8 @@ public class ElfController : MonoBehaviour
     {
         if (isDead) return;
 
-        float move = Input.GetAxisRaw("Horizontal");
+        // CHANGED: usa playerInput se disponível (fallback para Input antigo)
+        float move = playerInput != null ? playerInput.GetHorizontal() : Input.GetAxisRaw("Horizontal"); // CHANGED
 
         // Movimento
         if (!isAttacking && !isSliding)
@@ -102,17 +111,30 @@ public class ElfController : MonoBehaviour
                                                       attack3PivotInitialScale.z);
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isAttacking && !isSliding)
+        // CHANGED: Jump input via PlayerInput (fallback para KeyCode.Space)
+        if ((playerInput != null ? playerInput.GetJumpDown() : Input.GetKeyDown(KeyCode.Space)) && isGrounded && !isAttacking && !isSliding) // CHANGED
             Jump();
 
-        if (Input.GetKeyDown(KeyCode.LeftShift) && isGrounded && !isAttacking && !isSliding)
+        // CHANGED: Slide input via PlayerInput (fallback para LeftShift)
+        if ((playerInput != null ? playerInput.GetDodgeDown() : Input.GetKeyDown(KeyCode.LeftShift)) && isGrounded && !isAttacking && !isSliding) // CHANGED
             StartCoroutine(SlideCoroutine()); // <-- agora o slide dá invulnerabilidade
 
         if (!isAttacking && isGrounded && !isSliding)
         {
-            if (Input.GetKeyDown(KeyCode.Z)) Attack("Attack1");
-            else if (Input.GetKeyDown(KeyCode.X)) Attack("Attack2"); // <-- NÃO chama ShootProjectile() aqui
-            else if (Input.GetKeyDown(KeyCode.C)) Attack("Attack3");
+            // CHANGED: attack inputs via PlayerInput (com fallback)
+            if (playerInput != null)
+            {
+                if (playerInput.GetAction1Down()) Attack("Attack1");
+                else if (playerInput.GetAction2Down()) Attack("Attack2");
+                else if (playerInput.GetAction3Down()) Attack("Attack3");
+            }
+            else
+            {
+                if (Input.GetKeyDown(KeyCode.Z)) Attack("Attack1");
+                else if (Input.GetKeyDown(KeyCode.X)) Attack("Attack2"); // <-- NÃO chama ShootProjectile() aqui
+                else if (Input.GetKeyDown(KeyCode.C)) Attack("Attack3");
+            }
+            // CHANGED
         }
 
         anim.SetBool("isGrounded", isGrounded);

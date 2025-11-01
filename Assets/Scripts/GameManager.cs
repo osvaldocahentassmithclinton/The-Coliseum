@@ -43,8 +43,9 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        player1 = SpawnCharacter(p1Name, player1Spawn.position, false, player1Layer);
-        player2 = SpawnCharacter(p2Name, player2Spawn.position, true, player2Layer);
+        // CHANGED: passamos o playerIndex para que o spawn configure PlayerInput.playerId corretamente.
+        player1 = SpawnCharacter(p1Name, player1Spawn.position, false, player1Layer, 1); // CHANGED
+        player2 = SpawnCharacter(p2Name, player2Spawn.position, true, player2Layer, 2);  // CHANGED
 
         if (player1 == null || player2 == null)
         {
@@ -72,13 +73,19 @@ public class GameManager : MonoBehaviour
         if (dmg2 != null) dmg2.onDeath += () => OnCharacterDeath(2);
     }
 
-    private GameObject SpawnCharacter(string name, Vector3 position, bool flip, int layerID)
+    // CHANGED: adicionamos parâmetro playerIndex (1 ou 2)
+    private GameObject SpawnCharacter(string name, Vector3 position, bool flip, int layerID, int playerIndex) // CHANGED
     {
         foreach (var cp in characterPrefabs)
         {
             if (cp.characterName == name)
             {
                 GameObject obj = Instantiate(cp.prefab, position, Quaternion.identity);
+
+                // CHANGED: garante que o prefab terá um PlayerInput e configura o playerId dinamicamente
+                PlayerInput pi = obj.GetComponent<PlayerInput>(); // CHANGED
+                if (pi == null) pi = obj.AddComponent<PlayerInput>(); // CHANGED
+                pi.playerId = playerIndex; // CHANGED
 
                 SetLayerRecursively(obj, layerID);
 
