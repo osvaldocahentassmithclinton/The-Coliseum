@@ -2271,7 +2271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9a17834cd72db141b66d3ff142a17f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterName: mage
+  characterName: wizard
   selectionBorder: {fileID: 154201518}
 --- !u!114 &1385026602
 MonoBehaviour:
