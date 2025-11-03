@@ -112,10 +112,10 @@ TextureImporter:
       name: Hurt_0
       rect:
         serializedVersion: 2
-        x: 40
+        x: 0
         y: 0
-        width: 44
-        height: 59
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -134,10 +134,10 @@ TextureImporter:
       name: Hurt_1
       rect:
         serializedVersion: 2
-        x: 167
+        x: 128
         y: 0
-        width: 41
-        height: 59
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -156,10 +156,10 @@ TextureImporter:
       name: Hurt_2
       rect:
         serializedVersion: 2
-        x: 295
+        x: 256
         y: 0
-        width: 40
-        height: 59
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -178,10 +178,10 @@ TextureImporter:
       name: Hurt_3
       rect:
         serializedVersion: 2
-        x: 424
+        x: 384
         y: 0
-        width: 44
-        height: 59
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -200,7 +200,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 719686fc8b375e945a5b3c71111b7cda
     internalID: 0
     vertices: []
     indices: 
@@ -209,7 +209,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Hurt_0: -2048800907179887802
+      Hurt_1: 490842205202310979
+      Hurt_2: -3720053754089064719
+      Hurt_3: 5649970053243570431
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

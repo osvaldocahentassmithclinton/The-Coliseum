@@ -634,7 +634,28 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Flame_jet_0: -5917225385495910460
+      Flame_jet_1: 6185385370374865160
+      Flame_jet_10: 5862354036684096429
+      Flame_jet_11: 204132811695256350
+      Flame_jet_12: 4970080592206777693
+      Flame_jet_13: -304780578828527639
+      Flame_jet_14: 2826275064931682926
+      Flame_jet_15: -4101116586549745412
+      Flame_jet_16: 557883537612802549
+      Flame_jet_17: -592982695212483181
+      Flame_jet_18: 8405720916988566955
+      Flame_jet_19: -7791670593131038014
+      Flame_jet_2: -2884598962300304188
+      Flame_jet_20: -6654450932365588299
+      Flame_jet_3: 8693727599553184691
+      Flame_jet_4: -7365605940438354302
+      Flame_jet_5: 201168274936304639
+      Flame_jet_6: 4628084955922223119
+      Flame_jet_7: -2969656341666883635
+      Flame_jet_8: 1905417572217150490
+      Flame_jet_9: 6124931126438338997
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

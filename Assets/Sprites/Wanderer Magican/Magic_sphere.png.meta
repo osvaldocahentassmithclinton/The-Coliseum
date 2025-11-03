@@ -559,7 +559,25 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Magic_sphere_0: -8571103108822063580
+      Magic_sphere_1: -718366078737928552
+      Magic_sphere_10: -7974365517990884444
+      Magic_sphere_11: -402652293637123325
+      Magic_sphere_12: -5906043045037735742
+      Magic_sphere_13: 2964166749631488420
+      Magic_sphere_14: -118711484928587371
+      Magic_sphere_15: -7326014435009294269
+      Magic_sphere_16: -2648936685003926664
+      Magic_sphere_17: -2781656553101435235
+      Magic_sphere_2: -8661983569159562165
+      Magic_sphere_3: -7372392431262907882
+      Magic_sphere_4: -263584030246309254
+      Magic_sphere_5: -6734482102094267511
+      Magic_sphere_6: 7138974987340940556
+      Magic_sphere_7: -6281016108961661233
+      Magic_sphere_8: 668346195919898933
+      Magic_sphere_9: 6981741868490249956
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

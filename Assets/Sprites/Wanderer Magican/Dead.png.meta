@@ -112,10 +112,10 @@ TextureImporter:
       name: Dead_0
       rect:
         serializedVersion: 2
-        x: 32
+        x: 0
         y: 0
-        width: 41
-        height: 59
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -134,10 +134,10 @@ TextureImporter:
       name: Dead_1
       rect:
         serializedVersion: 2
-        x: 159
+        x: 128
         y: 0
-        width: 40
-        height: 57
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -156,10 +156,10 @@ TextureImporter:
       name: Dead_2
       rect:
         serializedVersion: 2
-        x: 287
+        x: 256
         y: 0
-        width: 60
-        height: 41
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -178,10 +178,10 @@ TextureImporter:
       name: Dead_3
       rect:
         serializedVersion: 2
-        x: 415
+        x: 384
         y: 0
-        width: 64
-        height: 11
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -200,7 +200,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 9624705b70d6b9644bc9d13f12857eb9
     internalID: 0
     vertices: []
     indices: 
@@ -209,7 +209,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Dead_0: 2649847697073447219
+      Dead_1: -8293461521501190705
+      Dead_2: -1631342717326862633
+      Dead_3: -3927913518680497933
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
