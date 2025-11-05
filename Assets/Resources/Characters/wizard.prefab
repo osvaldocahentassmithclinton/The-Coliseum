@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 3974049188787086114}
   - component: {fileID: -1529871359806947664}
   - component: {fileID: 3203676171509042724}
+  - component: {fileID: 6085208760712734303}
+  - component: {fileID: -4844817475030576765}
   m_Layer: 19
   m_Name: wizard
   m_TagString: Untagged
@@ -117,7 +119,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!70 &3974049188787086114
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -152,8 +154,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.35999998, y: 0.66999996}
+  m_Offset: {x: -0.03157236, y: -0.3021923}
+  m_Size: {x: 0.2968554, y: 0.5707726}
   m_Direction: 0
 --- !u!95 &-1529871359806947664
 Animator:
@@ -193,3 +195,34 @@ MonoBehaviour:
   invulnerabilityDuration: 1.2
   flashWhileInvulnerable: 1
   opponent: {fileID: 0}
+--- !u!114 &6085208760712734303
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885861107700763454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b9c5a18a4b688b498df3c643b2690c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 15
+  jumpForce: 25
+  gravityScale: 5
+  hitbox: {fileID: 0}
+  hitboxChildName: AttackHitbox
+  shieldDuration: 1.2
+--- !u!114 &-4844817475030576765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885861107700763454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 299de101fed6bc54a9d241b785a52301, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerId: 0

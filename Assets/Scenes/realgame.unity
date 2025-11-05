@@ -549,8 +549,8 @@ MonoBehaviour:
     prefab: {fileID: 9219821151951488813, guid: 9a011184eb94535448a750f84632ba97, type: 3}
   - characterName: dwarf
     prefab: {fileID: 0}
-  - characterName: mage
-    prefab: {fileID: 0}
+  - characterName: wizard
+    prefab: {fileID: 1885861107700763454, guid: aa2a942cb2491ce4eac9dfaa1c4e9ede, type: 3}
   - characterName: elf
     prefab: {fileID: 5666702232877693944, guid: 59dfd4872d9cd304b86ffc7bf5f04e8e, type: 3}
   - characterName: werewolf
