@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(Animator), typeof(Damageable))]
 public class WizardController : MonoBehaviour
@@ -13,8 +14,18 @@ public class WizardController : MonoBehaviour
     [SerializeField] private GameObject hitbox;
     [SerializeField] private string hitboxChildName = "AttackHitbox";
 
-    [Header("Defesa")]
-    public float shieldDuration = 1.2f;
+    [Header("Defesa / Mana")]
+    public float maxMana = 100f;
+    public float manaDrainPerSecond = 25f;
+    public float manaRegenPerSecond = 15f;
+    public float shieldBreakCooldown = 10f; // tempo sem poder usar shield após quebrar
+
+    [Tooltip("Se true, o estado de animação 'Shield' será pausado no último frame enquanto segurar.")]
+    public bool freezeShieldAtEnd = true; // <-- nome consistente
+
+    [Header("Referências (atribuir no Inspector)")]
+    [SerializeField] private Slider manaSlider;        // opcional: arraste o Slider da UI
+    [SerializeField] private GameObject shieldObject;  // filho que representa o escudo (com Collider2D e ShieldObject.cs)
 
     private Rigidbody2D rb;
     private Animator anim;
@@ -26,12 +37,17 @@ public class WizardController : MonoBehaviour
     private bool isGrounded;
     private bool isAttacking;
     private bool isShielding;
-   
+
     private bool isDead;
     private int comboStep;
     private bool canShield = true;
+    private bool shieldOnCooldown = false;
+    private bool shieldFrozenAtEnd = false;
 
+    // mana
+    private float currentMana;
 
+    // use same layer id check as before (preserve lógica existente)
     private int selfLayerID;
 
     void Start()
@@ -43,7 +59,7 @@ public class WizardController : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
 
         if (playerInput == null)
-            Debug.LogWarning($"{name}: PlayerInput não encontrado.");
+            Debug.LogWarning($"{name}: PlayerInput não encontrado. Fallback para Input.GetKey(...) (teclado).");
 
         selfLayerID = gameObject.layer;
         rb.gravityScale = gravityScale;
@@ -59,40 +75,111 @@ public class WizardController : MonoBehaviour
 
         damageable.onHit += OnTakeHit;
         damageable.onDeath += OnDeath;
+
+        currentMana = maxMana;
+        UpdateManaUI();
+
+        // deixe shieldObject desativado por padrão (visual)
+        if (shieldObject != null) shieldObject.SetActive(false);
     }
 
     void Update()
     {
-        if (isDead || isShielding) return;
+        if (isDead) return;
 
+        // inputs
         float moveInput = playerInput != null ? playerInput.GetHorizontal() : Input.GetAxisRaw("Horizontal");
         bool wantsToJump = playerInput != null ? playerInput.GetJumpDown() : Input.GetKey(KeyCode.Space);
         bool wantsToAttack = playerInput != null ? playerInput.GetAction1Down() : Input.GetMouseButtonDown(0);
-        bool wantsToShield = playerInput != null ? playerInput.GetDodgeDown() : Input.GetKeyDown(KeyCode.LeftShift);
+
+        // START do shield: usamos GetDodgeDown() do playerInput (não alterado)
+        bool wantsToShieldDown = playerInput != null ? playerInput.GetDodgeDown() : Input.GetKeyDown(KeyCode.LeftShift);
+        // HOLD/RELEASE: fallback ao teclado (LeftShift).
+        // Se você usa InputManager custom, adicione GetDodge() e GetDodgeUp() no PlayerInput para substituir esses checks.
+        bool wantsToShieldHold = Input.GetKey(KeyCode.LeftShift);
+        bool wantsToShieldUp = Input.GetKeyUp(KeyCode.LeftShift);
 
         if (!isAttacking)
             timeSinceAttack += Time.deltaTime;
 
+        // Attack
         if (wantsToAttack && isGrounded && !isShielding)
             Attack();
 
-        if (!isAttacking)
+        // Movement: não atualiza movimento enquanto shielding (bloqueio desejado)
+        if (!isAttacking && !isShielding)
             rb.linearVelocity = new Vector2(moveInput * speed, rb.linearVelocity.y);
 
+        // Jump
         if (wantsToJump)
             Jump();
 
-        if (wantsToShield && isGrounded && !isAttacking)
-            StartCoroutine(ActivateShield());
+        // Iniciar shield
+        if (wantsToShieldDown && isGrounded && !isAttacking && canShield && !shieldOnCooldown && currentMana > 0f)
+        {
+            StartShield();
+        }
 
-        if (moveInput != 0 && !isAttacking)
+        // Enquanto shield ativo: detectar release pelo teclado (fallback)
+        if (isShielding)
+        {
+            // se detectou release (teclado), para o shield
+            if (wantsToShieldUp)
+            {
+                StopShield();
+            }
+            else
+            {
+                // Drena mana enquanto estiver segurando
+                float drain = manaDrainPerSecond * Time.deltaTime;
+                currentMana -= drain;
+                if (currentMana <= 0f)
+                {
+                    currentMana = 0f;
+                    StopShield(); // sem mana, para o shield
+                }
+
+                UpdateManaUI();
+
+                // freeze no último frame do clipe Shield (se configurado)
+                if (freezeShieldAtEnd && !shieldFrozenAtEnd)
+                {
+                    AnimatorStateInfo st = anim.GetCurrentAnimatorStateInfo(0);
+                    if (st.IsName("Shield")) // ATENÇÃO: se o seu state tiver outro nome, mude aqui
+                    {
+                        if (st.normalizedTime >= 1f)
+                        {
+                            anim.speed = 0f;
+                            shieldFrozenAtEnd = true;
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            // regen de mana quando NÃO estiver atacando nem shielding
+            if (!isAttacking)
+            {
+                if (currentMana < maxMana)
+                {
+                    currentMana += manaRegenPerSecond * Time.deltaTime;
+                    if (currentMana > maxMana) currentMana = maxMana;
+                    UpdateManaUI();
+                }
+            }
+        }
+
+        // flip do sprite (só quando não estiver shield/attack, para manter bloqueio visual)
+        if (moveInput != 0 && !isAttacking && !isShielding)
             sr.flipX = moveInput < 0;
 
+        // Animator params (sempre atualizar)
         anim.SetBool("isAttacking", isAttacking);
         anim.SetBool("isGrounded", isGrounded);
         anim.SetBool("isRunning", moveInput != 0 && isGrounded && !isShielding && !isAttacking);
         anim.SetBool("isJumping", !isGrounded);
-       
+        anim.SetBool("isShielding", isShielding);
     }
 
     void Jump()
@@ -182,26 +269,76 @@ public class WizardController : MonoBehaviour
         if (hitbox != null) hitbox.SetActive(false);
     }
 
-    private IEnumerator ActivateShield()
+    // Start shield
+    private void StartShield()
     {
-        if (!canShield) yield break;
+        if (!canShield || shieldOnCooldown || currentMana <= 0f || isShielding) return;
 
-        canShield = false;
         isShielding = true;
-        anim.SetTrigger("shieldTrigger");
+        anim.speed = 1f;
+        shieldFrozenAtEnd = false;
 
+        // trigger/param para Animator
+        anim.SetTrigger("shieldTrigger");
+        anim.SetBool("isShielding", true);
+
+        // invulnerável
         if (damageable != null)
             damageable.SetInvulnerable(true);
 
-        yield return new WaitForSeconds(shieldDuration);
+        // ativa shield object visual/colisor
+        if (shieldObject != null)
+            shieldObject.SetActive(true);
+    }
+
+    // Stop shield
+    private void StopShield()
+    {
+        if (!isShielding) return;
 
         isShielding = false;
+        anim.SetBool("isShielding", false);
+
+        // restaurar animação
+        anim.speed = 1f;
+        shieldFrozenAtEnd = false;
 
         if (damageable != null)
             damageable.SetInvulnerable(false);
 
-        yield return new WaitForSeconds(0.2f); // pequeno delay antes de permitir novo shield
+        // desativa shield object visual
+        if (shieldObject != null)
+            shieldObject.SetActive(false);
+    }
+
+    // Chamado pelo ShieldObject quando quebrar
+    public void OnShieldBroken()
+    {
+        StopShield();
+        if (!shieldOnCooldown)
+            StartCoroutine(ShieldBreakCooldownCoroutine(shieldBreakCooldown));
+    }
+
+    private IEnumerator ShieldBreakCooldownCoroutine(float cooldown)
+    {
+        shieldOnCooldown = true;
+        canShield = false;
+
+        // desative visual local (shieldObject já foi desativado no Break)
+        yield return new WaitForSeconds(cooldown);
+
+        shieldOnCooldown = false;
         canShield = true;
+
+        // quando reativar o shieldObject, o próprio ShieldObject reseta hits no OnEnable()
+        if (shieldObject != null)
+            shieldObject.SetActive(false); // deixamos desativado até o jogador pressionar
+    }
+
+    private void UpdateManaUI()
+    {
+        if (manaSlider != null)
+            manaSlider.value = currentMana / maxMana;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
