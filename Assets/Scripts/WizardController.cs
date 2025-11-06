@@ -26,8 +26,11 @@ public class WizardController : MonoBehaviour
     private bool isGrounded;
     private bool isAttacking;
     private bool isShielding;
+   
     private bool isDead;
     private int comboStep;
+    private bool canShield = true;
+
 
     private int selfLayerID;
 
@@ -89,7 +92,7 @@ public class WizardController : MonoBehaviour
         anim.SetBool("isGrounded", isGrounded);
         anim.SetBool("isRunning", moveInput != 0 && isGrounded && !isShielding && !isAttacking);
         anim.SetBool("isJumping", !isGrounded);
-        anim.SetBool("isShielding", isShielding);
+       
     }
 
     void Jump()
@@ -181,8 +184,11 @@ public class WizardController : MonoBehaviour
 
     private IEnumerator ActivateShield()
     {
+        if (!canShield) yield break;
+
+        canShield = false;
         isShielding = true;
-        anim.SetBool("isShielding", true);
+        anim.SetTrigger("shieldTrigger");
 
         if (damageable != null)
             damageable.SetInvulnerable(true);
@@ -190,10 +196,12 @@ public class WizardController : MonoBehaviour
         yield return new WaitForSeconds(shieldDuration);
 
         isShielding = false;
-        anim.SetBool("isShielding", false);
 
         if (damageable != null)
             damageable.SetInvulnerable(false);
+
+        yield return new WaitForSeconds(0.2f); // pequeno delay antes de permitir novo shield
+        canShield = true;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
