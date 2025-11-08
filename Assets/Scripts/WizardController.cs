@@ -196,6 +196,9 @@ public class WizardController : MonoBehaviour
         anim.SetBool("isRunning", moveInput != 0 && isGrounded && !isShielding && !isAttacking);
         anim.SetBool("isJumping", !isGrounded);
         anim.SetBool("isShielding", isShielding);
+        bool isFalling = rb.linearVelocity.y < -0.1f && !isGrounded;
+        anim.SetBool("isFalling", isFalling);
+
     }
 
     void Jump()

@@ -94,6 +94,8 @@ public class KnightController : MonoBehaviour
         anim.SetBool("isGrounded", isGrounded);
         anim.SetBool("isRunning", moveInput != 0 && isGrounded && !isRolling && !isAttacking);
         anim.SetBool("isJumping", !isGrounded);
+        anim.SetBool("isFalling", rb.linearVelocity.y < -0.1f && !isGrounded);
+
     }
 
     void Jump()

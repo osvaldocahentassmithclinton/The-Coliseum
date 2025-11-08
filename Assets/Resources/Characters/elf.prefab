@@ -414,7 +414,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
-  invulnerabilityDuration: 2
+  invulnerabilityDuration: 1.2
   flashWhileInvulnerable: 1
   opponent: {fileID: 0}
 --- !u!114 &6190686732193789914
