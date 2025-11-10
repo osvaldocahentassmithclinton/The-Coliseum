@@ -72,15 +72,22 @@ public class WizardController : MonoBehaviour
         Slider slider1 = GameObject.Find("ManaBar_Player1")?.GetComponent<Slider>();
         Slider slider2 = GameObject.Find("ManaBar_Player2")?.GetComponent<Slider>();
 
+        // Configuração das barras conforme o jogador
         if (layerName == player1LayerName && slider1 != null)
         {
             activeManaSlider = slider1;
             if (slider2 != null) slider2.gameObject.SetActive(false);
+
+            // Player 1 -> barra normal (esquerda → direita)
+            activeManaSlider.direction = Slider.Direction.LeftToRight;
         }
         else if (layerName == player2LayerName && slider2 != null)
         {
             activeManaSlider = slider2;
             if (slider1 != null) slider1.gameObject.SetActive(false);
+
+            // Player 2 -> barra flipada (direita → esquerda)
+            activeManaSlider.direction = Slider.Direction.RightToLeft;
         }
         else
         {
@@ -145,7 +152,11 @@ public class WizardController : MonoBehaviour
 
         // Iniciar shield
         if (wantsToShieldDown && isGrounded && !isAttacking && canShield && !shieldOnCooldown && currentMana > 0f)
-            StartShield();
+        {
+            // Só permite se não estiver se movendo (parado no eixo X)
+            if (Mathf.Abs(rb.linearVelocity.x) < 0.1f)
+                StartShield();
+        }
 
         // Segurar / soltar shield
         if (isShielding)
@@ -198,7 +209,6 @@ public class WizardController : MonoBehaviour
         anim.SetBool("isShielding", isShielding);
         bool isFalling = rb.linearVelocity.y < -0.1f && !isGrounded;
         anim.SetBool("isFalling", isFalling);
-
     }
 
     void Jump()
@@ -288,6 +298,14 @@ public class WizardController : MonoBehaviour
             activeManaSlider.value = currentMana / maxMana;
     }
 
+    // 🔹 Método para esconder/mostrar a barra de mana quando entra/sai de campo
+    public void SetActiveState(bool isActive)
+    {
+        gameObject.SetActive(isActive);
+        if (activeManaSlider != null)
+            activeManaSlider.gameObject.SetActive(isActive);
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("ground")) isGrounded = true;
@@ -310,6 +328,7 @@ public class WizardController : MonoBehaviour
         isDead = true;
         this.enabled = false;
     }
+
     private void CastMagic()
     {
         isAttacking = true;
@@ -322,8 +341,8 @@ public class WizardController : MonoBehaviour
         Vector2 direction = sr.flipX ? Vector2.left : Vector2.right;
         GameObject magic = Instantiate(magicPrefab, magicSpawnPoint.position, Quaternion.identity);
         magic.GetComponent<MagicProjectile>().Initialize(direction, gameObject);
-
     }
+
     public void SpawnMagicProjectile()
     {
         if (currentMana < magicManaCost) return;
@@ -334,7 +353,5 @@ public class WizardController : MonoBehaviour
         Vector2 direction = sr.flipX ? Vector2.left : Vector2.right;
         GameObject magic = Instantiate(magicPrefab, magicSpawnPoint.position, Quaternion.identity);
         magic.GetComponent<MagicProjectile>().Initialize(direction, gameObject);
-
     }
-
 }
