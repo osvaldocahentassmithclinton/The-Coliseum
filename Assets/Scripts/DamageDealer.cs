@@ -16,7 +16,6 @@ public class DamageDealer : MonoBehaviour
             Destroy(gameObject, lifeTime);
     }
 
-    // Nota:
-    // Não implementamos lógica de dano aqui (OnTriggerEnter) porque o Damageable
-    // faz OnTriggerEnter e aplica invulnerabilidade. Manter código simples evita conflitos.
+    
+    
 }

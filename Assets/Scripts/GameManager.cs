@@ -24,8 +24,8 @@ public class GameManager : MonoBehaviour
     public int player2Layer = 9;
 
     [Header("UI")]
-    public HealthBar player1HealthBar; // arrastar referência no inspector
-    public HealthBar player2HealthBar; // arrastar referência no inspector
+    public HealthBar player1HealthBar;
+    public HealthBar player2HealthBar;
 
     private GameObject player1;
     private GameObject player2;
@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // CHANGED: passamos o playerIndex para que o spawn configure PlayerInput.playerId corretamente.
+        
         player1 = SpawnCharacter(p1Name, player1Spawn.position, false, player1Layer, 1); // CHANGED
         player2 = SpawnCharacter(p2Name, player2Spawn.position, true, player2Layer, 2);  // CHANGED
 
@@ -61,19 +61,19 @@ public class GameManager : MonoBehaviour
         if (dmg1 != null) dmg1.opponent = player2;
         if (dmg2 != null) dmg2.opponent = player1;
 
-        // Vincula as HealthBars (se atribuídas no Inspector)
+        
         if (player1HealthBar != null && dmg1 != null)
             player1HealthBar.target = dmg1;
 
         if (player2HealthBar != null && dmg2 != null)
             player2HealthBar.target = dmg2;
 
-        // Inscreve eventos de morte para checar fim de jogo
+        
         if (dmg1 != null) dmg1.onDeath += () => OnCharacterDeath(1);
         if (dmg2 != null) dmg2.onDeath += () => OnCharacterDeath(2);
     }
 
-    // CHANGED: adicionamos parâmetro playerIndex (1 ou 2)
+  
     private GameObject SpawnCharacter(string name, Vector3 position, bool flip, int layerID, int playerIndex) // CHANGED
     {
         foreach (var cp in characterPrefabs)
@@ -82,10 +82,10 @@ public class GameManager : MonoBehaviour
             {
                 GameObject obj = Instantiate(cp.prefab, position, Quaternion.identity);
 
-                // CHANGED: garante que o prefab terá um PlayerInput e configura o playerId dinamicamente
-                PlayerInput pi = obj.GetComponent<PlayerInput>(); // CHANGED
-                if (pi == null) pi = obj.AddComponent<PlayerInput>(); // CHANGED
-                pi.playerId = playerIndex; // CHANGED
+               
+                PlayerInput pi = obj.GetComponent<PlayerInput>(); 
+                if (pi == null) pi = obj.AddComponent<PlayerInput>(); 
+                pi.playerId = playerIndex; 
 
                 SetLayerRecursively(obj, layerID);
 
@@ -117,7 +117,7 @@ public class GameManager : MonoBehaviour
     {
         if (gameEnded) return;
 
-        // Checa estado das duas entidades
+       
         var dmg1 = player1 != null ? player1.GetComponent<Damageable>() : null;
         var dmg2 = player2 != null ? player2.GetComponent<Damageable>() : null;
 
@@ -149,16 +149,16 @@ public class GameManager : MonoBehaviour
         Debug.Log("Fim de jogo: " + message);
     }
 
-    // Métodos públicos ligados aos botões (no UIManager/na cena)
+    
     public void GoToMainMenu()
     {
         Time.timeScale = 1f;
-        // SceneManager.LoadScene("MainMenu"); // descomente e coloque o nome correto
+         
     }
 
     public void GoToCharacterSelect()
     {
         Time.timeScale = 1f;
-        // SceneManager.LoadScene("CharacterSelect"); // descomente e coloque o nome correto
+       
     }
 }

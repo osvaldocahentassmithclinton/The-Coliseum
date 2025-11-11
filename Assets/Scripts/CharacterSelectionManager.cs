@@ -2,7 +2,7 @@
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using TMPro; // ← necessário para usar TMP_Text
+using TMPro; 
 
 public class CharacterSelectionManager : MonoBehaviour
 {
@@ -11,7 +11,7 @@ public class CharacterSelectionManager : MonoBehaviour
 
     [SerializeField] private List<CharacterButton> characterButtons;
 
-    // Agora funciona com TextMeshPro
+    
     [SerializeField] private TMP_Text selectingPlayerText;
 
     public static string selectedCharacterP1;
@@ -30,7 +30,7 @@ public class CharacterSelectionManager : MonoBehaviour
             btn.SetManager(this);
         }
 
-        // Mostra "P1" no início
+        
         if (selectingPlayerText != null)
         {
             selectingPlayerText.gameObject.SetActive(true);
@@ -59,14 +59,14 @@ public class CharacterSelectionManager : MonoBehaviour
             preSelectedCharacter = null;
             Debug.Log("Jogador 1 escolheu: " + selectedCharacterP1);
 
-            // Atualiza o texto para mostrar que agora é o P2
+            
             if (selectingPlayerText != null)
             {
                 selectingPlayerText.gameObject.SetActive(true);
                 selectingPlayerText.text = "P2";
             }
 
-            // Limpa seleções visuais
+            
             foreach (var btn in characterButtons)
                 btn.SetSelected(false);
         }
@@ -82,7 +82,7 @@ public class CharacterSelectionManager : MonoBehaviour
         }
     }
 
-    // === Funções de seleção aleatória ===
+    
 
     public void RandomSelectForCurrentPlayer()
     {

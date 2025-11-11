@@ -6,17 +6,17 @@ using TMPro;
 public class CutsceneManager : MonoBehaviour
 {
     [Header("UI References")]
-    public GameObject cutsceneCanvas;    // painel principal (CutsceneCanvas)
-    public Image cutsceneImage;          // imagem da parte atual
-    public TMP_Text subtitleText;        // legenda (TMP_Text)
-    public Button skipButton;            // botão pular/avançar
+    public GameObject cutsceneCanvas;    
+    public Image cutsceneImage;         
+    public TMP_Text subtitleText;     
+    public Button skipButton;          
 
     [Header("Cutscene Content")]
-    public Sprite[] cutsceneSprites;     // sprites da cutscene
-    [TextArea] public string[] subtitles; // legendas correspondentes
+    public Sprite[] cutsceneSprites;   
+    [TextArea] public string[] subtitles; 
 
     [Header("Typing Effect")]
-    public float charDelay = 0.03f;      // tempo entre letras
+    public float charDelay = 0.03f;     
 
     private int currentIndex = 0;
     private bool isTyping = false;
@@ -26,10 +26,10 @@ public class CutsceneManager : MonoBehaviour
 
     void Start()
     {
-        // botão de pular (na cutscene)
+        
         skipButton.onClick.AddListener(OnSkipButtonClicked);
 
-        // exibe apenas na primeira vez
+     
         if (!PlayerPrefs.HasKey(PREF_KEY_FIRST_LAUNCH))
         {
             PlayerPrefs.SetInt(PREF_KEY_FIRST_LAUNCH, 1);
@@ -75,7 +75,7 @@ public class CutsceneManager : MonoBehaviour
             float timer = 0f;
             while (timer < charDelay)
             {
-                if (!isTyping) // se o jogador clicar pra pular
+                if (!isTyping)
                 {
                     subtitleText.text = text;
                     yield break;
@@ -92,12 +92,12 @@ public class CutsceneManager : MonoBehaviour
     {
         if (isTyping)
         {
-            // termina a digitação instantaneamente
+          
             isTyping = false;
         }
         else
         {
-            // avança pra próxima parte
+            
             currentIndex++;
             ShowCurrentPart();
         }
@@ -108,13 +108,13 @@ public class CutsceneManager : MonoBehaviour
         cutsceneCanvas.SetActive(false);
     }
 
-    // usado pelo botão do menu
+  
     public void ReplayCutscene()
     {
         StartCutscene();
     }
 
-    // opcional: limpar a flag da primeira vez
+ 
     public static void ResetFlag()
     {
         PlayerPrefs.DeleteKey(PREF_KEY_FIRST_LAUNCH);

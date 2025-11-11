@@ -14,9 +14,9 @@ public class ControlsConfig : ScriptableObject
         public KeyCode left;
         public KeyCode right;
         public KeyCode jump;
-        public KeyCode dodge;      // método de desvio
-        public KeyCode action1;    // ataque 1 (atq/def)
-        public KeyCode action2;    // ataque 2 (atq/def)
-        public KeyCode action3;    // ataque 3 (atq/def)
+        public KeyCode dodge;      
+        public KeyCode action1;    
+        public KeyCode action2;    
+        public KeyCode action3;    
     }
 }
