@@ -39,6 +39,12 @@ public class ElfController : MonoBehaviour
     public Transform projectileSpawnPoint;
     public float projectileSpeed = 10f;
 
+    // CHANGED: fallback para resetar isAttacking caso o Animation Event falhe
+    [Header("Segurança de ataque")]
+    [Tooltip("Tempo máximo (s) que o personagem pode ficar em estado de ataque antes do fallback limpar o estado.")]
+    [SerializeField] private float maxAttackDuration = 1.2f; // CHANGED
+    private Coroutine attackTimeoutCoroutine; // CHANGED
+
     void Start()
     {
         anim = GetComponent<Animator>();
@@ -185,10 +191,39 @@ public class ElfController : MonoBehaviour
         isAttacking = true;
         anim.SetTrigger(attackName);
 
+        // CHANGED: inicia fallback que limpa isAttacking caso o Animation Event EndAttack não seja disparado
+        if (attackTimeoutCoroutine != null) StopCoroutine(attackTimeoutCoroutine);
+        attackTimeoutCoroutine = StartCoroutine(AttackTimeoutCoroutine()); // CHANGED
+
         // OBS: ShootProjectile deve ser chamado por Animation Event (ex: "ShootProjectile")
     }
 
-    public void EndAttack() => isAttacking = false;
+    // CHANGED: garante que quando o Animation Event chamar EndAttack, a coroutine de timeout é parada
+    public void EndAttack()
+    {
+        isAttacking = false;
+        if (attackTimeoutCoroutine != null)
+        {
+            StopCoroutine(attackTimeoutCoroutine);
+            attackTimeoutCoroutine = null;
+        }
+    }
+    // ============================
+
+    // CHANGED: coroutine de fallback que garante não travar indefinidamente em isAttacking
+    private IEnumerator AttackTimeoutCoroutine()
+    {
+        yield return new WaitForSeconds(maxAttackDuration);
+        if (isAttacking)
+        {
+            // se ainda estiver atacando, limpa o estado e loga para debug
+            isAttacking = false;
+            Debug.LogWarning($"{name}: EndAttack fallback acionado após {maxAttackDuration}s (possível Animation Event faltando).");
+            // limpa referência
+        }
+        attackTimeoutCoroutine = null;
+    }
+    // ============================
 
     // ============================
     // EnableHitbox aplica dano imediatamente via OverlapCollider
