@@ -44,8 +44,8 @@ public class GameManager : MonoBehaviour
         }
 
         
-        player1 = SpawnCharacter(p1Name, player1Spawn.position, false, player1Layer, 1); // CHANGED
-        player2 = SpawnCharacter(p2Name, player2Spawn.position, true, player2Layer, 2);  // CHANGED
+        player1 = SpawnCharacter(p1Name, player1Spawn.position, false, player1Layer, 1);
+        player2 = SpawnCharacter(p2Name, player2Spawn.position, true, player2Layer, 2); 
 
         if (player1 == null || player2 == null)
         {
@@ -74,7 +74,7 @@ public class GameManager : MonoBehaviour
     }
 
   
-    private GameObject SpawnCharacter(string name, Vector3 position, bool flip, int layerID, int playerIndex) // CHANGED
+    private GameObject SpawnCharacter(string name, Vector3 position, bool flip, int layerID, int playerIndex) 
     {
         foreach (var cp in characterPrefabs)
         {

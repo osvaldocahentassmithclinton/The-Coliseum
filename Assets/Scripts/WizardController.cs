@@ -64,21 +64,21 @@ public class WizardController : MonoBehaviour
 
         rb.gravityScale = gravityScale;
 
-        // Detectar layer
+      
         string layerName = LayerMask.LayerToName(gameObject.layer);
         Debug.Log($"{name} está na layer: {layerName}");
 
-        // Procurar sliders na cena
+        
         Slider slider1 = GameObject.Find("ManaBar_Player1")?.GetComponent<Slider>();
         Slider slider2 = GameObject.Find("ManaBar_Player2")?.GetComponent<Slider>();
 
-        // Configuração das barras conforme o jogador
+      
         if (layerName == player1LayerName && slider1 != null)
         {
             activeManaSlider = slider1;
             if (slider2 != null) slider2.gameObject.SetActive(false);
 
-            // Player 1 -> barra normal (esquerda → direita)
+            
             activeManaSlider.direction = Slider.Direction.LeftToRight;
         }
         else if (layerName == player2LayerName && slider2 != null)
@@ -86,7 +86,7 @@ public class WizardController : MonoBehaviour
             activeManaSlider = slider2;
             if (slider1 != null) slider1.gameObject.SetActive(false);
 
-            // Player 2 -> barra flipada (direita → esquerda)
+          
             activeManaSlider.direction = Slider.Direction.RightToLeft;
         }
         else
@@ -94,7 +94,7 @@ public class WizardController : MonoBehaviour
             Debug.LogWarning($"{name}: Nenhum slider de mana encontrado para layer '{layerName}'.");
         }
 
-        // Configuração da hitbox
+      
         if (hitbox == null)
         {
             Transform childTransform = transform.Find(hitboxChildName);
@@ -112,7 +112,7 @@ public class WizardController : MonoBehaviour
             shieldObject.SetActive(false);
     }
 
-    // 🔹 Funções de tecla do escudo (Player1 vs Player2)
+    
     private KeyCode GetShieldKey()
     {
         string layerName = LayerMask.LayerToName(gameObject.layer);
@@ -150,15 +150,15 @@ public class WizardController : MonoBehaviour
         if (wantsToJump)
             Jump();
 
-        // Iniciar shield
+       
         if (wantsToShieldDown && isGrounded && !isAttacking && canShield && !shieldOnCooldown && currentMana > 0f)
         {
-            // Só permite se não estiver se movendo (parado no eixo X)
+           
             if (Mathf.Abs(rb.linearVelocity.x) < 0.1f)
                 StartShield();
         }
 
-        // Segurar / soltar shield
+       
         if (isShielding)
         {
             if (!wantsToShieldHold || wantsToShieldUp)
@@ -298,7 +298,7 @@ public class WizardController : MonoBehaviour
             activeManaSlider.value = currentMana / maxMana;
     }
 
-    // 🔹 Método para esconder/mostrar a barra de mana quando entra/sai de campo
+    
     public void SetActiveState(bool isActive)
     {
         gameObject.SetActive(isActive);

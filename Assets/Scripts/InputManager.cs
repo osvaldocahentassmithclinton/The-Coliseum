@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Singleton que lê o ControlsConfig e expõe métodos para checar entradas por jogador.
+
 /// </summary>
 public class InputManager : MonoBehaviour
 {
@@ -21,7 +21,7 @@ public class InputManager : MonoBehaviour
             Debug.LogWarning("InputManager: ControlsConfig não atribuído no inspector.");
     }
 
-    // retorna -1/0/1 baseado nas teclas definidas
+   
     public float GetHorizontal(int player)
     {
         var ctrlOpt = GetControls(player);
@@ -35,7 +35,7 @@ public class InputManager : MonoBehaviour
         return 0f;
     }
 
-    // genéricos para botões (usa selector para escolher a KeyCode do struct)
+   
     public bool GetButtonDown(int player, Func<ControlsConfig.PlayerControls, KeyCode> selector)
     {
         var ctrlOpt = GetControls(player);
@@ -57,7 +57,7 @@ public class InputManager : MonoBehaviour
         return Input.GetKeyUp(selector(ctrlOpt.Value));
     }
 
-    // helpers
+   
     public bool GetJumpDown(int player) => GetButtonDown(player, c => c.jump);
     public bool GetDodgeDown(int player) => GetButtonDown(player, c => c.dodge);
     public bool GetAction1Down(int player) => GetButtonDown(player, c => c.action1);

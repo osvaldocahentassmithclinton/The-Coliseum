@@ -13,7 +13,7 @@ public class ProjectileArrow : MonoBehaviour
     private bool hasHit = false;
     private bool isFading = false;
 
-    private GameObject shooter; // dono da flecha
+    private GameObject shooter; 
 
     [Header("Configurações da Flecha")]
     public float speed = 10f;
@@ -40,7 +40,7 @@ public class ProjectileArrow : MonoBehaviour
         Destroy(gameObject, lifeTime);
     }
 
-    // Chamado pelo controller do elfo
+  
     public void SetDirection(float dir, GameObject owner)
     {
         direction = dir;
@@ -64,23 +64,23 @@ public class ProjectileArrow : MonoBehaviour
     {
         if (isFading || hasHit) return;
 
-        // evita acertar o próprio atirador
+        
         if (shooter != null && other.gameObject == shooter) return;
 
-        // tenta pegar Damageable
+       
         Damageable target = other.GetComponent<Damageable>();
         if (target != null)
         {
-            // evita friendly fire por layer
+            
             if (other.gameObject.layer == gameObject.layer) return;
 
-            // aplica dano através do Damageable (que já tem invulnerabilidade)
+            
             if (dmgDealer != null)
                 target.TakeDamage(dmgDealer.damage);
 
             hasHit = true;
 
-            // desativa o colisor para prevenir múltiplos hits
+            
             if (projectileCollider != null)
                 projectileCollider.enabled = false;
 
@@ -88,7 +88,7 @@ public class ProjectileArrow : MonoBehaviour
             return;
         }
 
-        // se bateu em parede
+      
         int layer = other.gameObject.layer;
         if (((1 << layer) & wallLayer) != 0)
         {

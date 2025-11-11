@@ -1,8 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Componente simples para anexar aos prefabs/players. 
-/// Define qual playerId (1 ou 2) e fornece wrappers de input para os controllers.
+
 /// </summary>
 public class PlayerInput : MonoBehaviour
 {

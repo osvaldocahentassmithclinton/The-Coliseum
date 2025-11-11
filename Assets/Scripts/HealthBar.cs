@@ -4,7 +4,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Slider))]
 public class HealthBar : MonoBehaviour
 {
-    public Damageable target; // atribuído pelo GameManager no Start
+    public Damageable target; 
     private Slider slider;
 
     void Awake()
@@ -29,8 +29,8 @@ public class HealthBar : MonoBehaviour
     {
         if (target == null) return;
 
-        // Atualiza valor da barra
-        slider.maxValue = target.maxHealth; // em caso de buffs
+        
+        slider.maxValue = target.maxHealth; 
         slider.value = Mathf.Clamp(target.CurrentHealth, 0f, target.maxHealth);
     }
 }

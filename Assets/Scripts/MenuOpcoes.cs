@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;  // Importante para carregar cenas
+using UnityEngine.SceneManagement; 
 
 public class MenuOpcoes : MonoBehaviour
 {
@@ -8,12 +8,12 @@ public class MenuOpcoes : MonoBehaviour
     public GameObject painelOpcoes;
     public Slider sliderBrilho;
     public Slider sliderVolumeMusica;
-    public Image mascaraBrilho; // <<< Imagem preta semi-transparente sobre a tela
+    public Image mascaraBrilho; 
 
     [Header("Referência ao Audio")]
     public AudioSource musicaDeFundo;
 
-    // ========== Novos campos para controle de música entre cenas ==========
+  
     [Header("Configuração de músicas por cena (mínimo necessário)")]
     [Tooltip("Música usada nas duas cenas que devem compartilhar o mesmo tempo de reprodução")]
     public AudioClip sharedMusic;
@@ -26,11 +26,11 @@ public class MenuOpcoes : MonoBehaviour
     public string otherSceneName;
     [Tooltip("Música que toca na cena 'otherSceneName'")]
     public AudioClip otherMusic;
-    // =====================================================================
+    
 
     void Start()
     {
-        // Carrega configurações salvas
+        
         float brilhoSalvo = PlayerPrefs.GetFloat("Brilho", 1f);
         float volumeSalvo = PlayerPrefs.GetFloat("VolumeMusica", 1f);
 
@@ -40,14 +40,14 @@ public class MenuOpcoes : MonoBehaviour
         AjustarBrilho(brilhoSalvo);
         AjustarVolumeMusica(volumeSalvo);
 
-        // Adiciona listeners
+       
         sliderBrilho.onValueChanged.AddListener(AjustarBrilho);
         sliderVolumeMusica.onValueChanged.AddListener(AjustarVolumeMusica);
 
         painelOpcoes.SetActive(false);
 
-        // Inicializa o player de música persistente (se ainda não existir)
-        // Passa as configurações que o usuário preencheu no Inspector.
+      
+     
         MusicPersistent.SetupIfNeeded(sharedMusic, otherMusic, sceneNameSharedA, sceneNameSharedB, otherSceneName, volumeSalvo);
     }
 
@@ -58,11 +58,11 @@ public class MenuOpcoes : MonoBehaviour
 
     public void AjustarBrilho(float valor)
     {
-        // Simula o brilho ajustando o alpha da imagem preta
+       
         if (mascaraBrilho != null)
         {
             Color corAtual = mascaraBrilho.color;
-            corAtual.a = 1f - valor; // brilho 1 => alpha 0 (transparente), brilho 0 => alpha 1 (preto total)
+            corAtual.a = 1f - valor; 
             mascaraBrilho.color = corAtual;
         }
 
@@ -71,7 +71,7 @@ public class MenuOpcoes : MonoBehaviour
 
     public void AjustarVolumeMusica(float volume)
     {
-        // Se houver um MusicPersistent, encaminha pra ele (persistente entre cenas)
+        
         if (MusicPersistent.Instance != null)
         {
             MusicPersistent.Instance.SetVolume(volume);
@@ -91,16 +91,14 @@ public class MenuOpcoes : MonoBehaviour
         painelOpcoes.SetActive(false);
     }
 
-    // NOVO: Método para voltar ao menu principal
+   
     public void VoltarAoMenuPrincipal()
     {
-        PlayerPrefs.Save(); // Salva as prefs antes de sair
-        SceneManager.LoadScene("menu"); // Substitua pelo nome da sua cena de menu
+        PlayerPrefs.Save();
+        SceneManager.LoadScene("menu");
     }
 
-    // ===========================
-    // CLASSE INTERNA: gerencia música persistente entre cenas
-    // ===========================
+   
     private class MusicPersistent : MonoBehaviour
     {
         public static MusicPersistent Instance;
@@ -112,11 +110,11 @@ public class MenuOpcoes : MonoBehaviour
         private string sharedB;
         private string otherScene;
 
-        // para preservar tempo quando se troca entre sharedA e sharedB
+       
         private string lastKey = "";
         private float lastTime = 0f;
 
-        // Setup chamado pela MenuOpcoes.Start para criar/atualizar o singleton
+      
         public static void SetupIfNeeded(AudioClip sharedMusic, AudioClip otherMusic, string sA, string sB, string sOther, float initialVolume)
         {
             if (Instance == null)
@@ -130,7 +128,6 @@ public class MenuOpcoes : MonoBehaviour
                 SceneManager.sceneLoaded += Instance.OnSceneLoaded;
             }
 
-            // aplica configs
             Instance.shared = sharedMusic;
             Instance.other = otherMusic;
             Instance.sharedA = sA;
@@ -138,7 +135,7 @@ public class MenuOpcoes : MonoBehaviour
             Instance.otherScene = sOther;
             Instance.SetVolume(initialVolume);
 
-            // decide o que tocar agora (baseado na cena ativa)
+          
             Scene current = SceneManager.GetActiveScene();
             Instance.HandleSceneChange(current.name);
         }
@@ -156,13 +153,13 @@ public class MenuOpcoes : MonoBehaviour
 
         private void HandleSceneChange(string sceneName)
         {
-            // guarda tempo atual antes de qualquer troca
+           
             if (src != null && src.isPlaying && src.clip != null)
             {
                 lastTime = src.time;
             }
 
-            // escolhe qual clip tocar
+         
             AudioClip desired = null;
             string key = "";
 
@@ -178,16 +175,15 @@ public class MenuOpcoes : MonoBehaviour
             }
             else
             {
-                // cena não configurada: se quiser, mantemos a música atual.
-                // Aqui, vamos manter o que já estava tocando (não parar).
+             
                 desired = src.clip;
-                // key permanece como lastKey para preservar comportamento
+               
                 key = lastKey;
             }
 
             if (desired == null)
             {
-                // nada configurado para tocar aqui; deixa como está (ou para)
+               
                 if (src.isPlaying)
                 {
                     src.Pause();
@@ -196,19 +192,19 @@ public class MenuOpcoes : MonoBehaviour
                 return;
             }
 
-            // se já está tocando esse clip, não reinicia
+            
             if (src.clip == desired && src.isPlaying)
             {
-                // nada a fazer, mas atualiza lastKey
+                
                 lastKey = key;
                 return;
             }
 
-            // se trocando entre as duplas que compartilham, preserva tempo
+          
             float startTime = 0f;
             if (key == "shared" && lastKey == "shared")
             {
-                // mantemos lastTime (o tempo que gravamos antes)
+              
                 startTime = lastTime;
             }
             else

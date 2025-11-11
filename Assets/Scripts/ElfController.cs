@@ -10,8 +10,8 @@ public class ElfController : MonoBehaviour
     private SpriteRenderer sr;
     private int selfLayerID;
 
-    // CHANGED: referência ao PlayerInput
-    private PlayerInput playerInput; // CHANGED
+   
+    private PlayerInput playerInput;
 
     [Header("Configurações de Movimento")]
     public float speed = 5f;
@@ -39,11 +39,11 @@ public class ElfController : MonoBehaviour
     public Transform projectileSpawnPoint;
     public float projectileSpeed = 10f;
 
-    // CHANGED: fallback para resetar isAttacking caso o Animation Event falhe
+    
     [Header("Segurança de ataque")]
     [Tooltip("Tempo máximo (s) que o personagem pode ficar em estado de ataque antes do fallback limpar o estado.")]
-    [SerializeField] private float maxAttackDuration = 1.2f; // CHANGED
-    private Coroutine attackTimeoutCoroutine; // CHANGED
+    [SerializeField] private float maxAttackDuration = 1.2f; 
+    private Coroutine attackTimeoutCoroutine; 
 
     void Start()
     {
@@ -54,10 +54,10 @@ public class ElfController : MonoBehaviour
 
         selfLayerID = gameObject.layer;
 
-        // CHANGED: pega PlayerInput no mesmo GameObject (mínima alteração)
-        playerInput = GetComponent<PlayerInput>(); // CHANGED
+       
+        playerInput = GetComponent<PlayerInput>(); 
         if (playerInput == null)
-            Debug.LogWarning($"{name}: PlayerInput não encontrado. Adicione PlayerInput ao prefab e defina playerId."); // CHANGED
+            Debug.LogWarning($"{name}: PlayerInput não encontrado. Adicione PlayerInput ao prefab e defina playerId."); 
 
         if (attack1Hitbox == null)
             attack1Hitbox = FindChildByName("Attack1_Hitbox");
@@ -84,10 +84,10 @@ public class ElfController : MonoBehaviour
     {
         if (isDead) return;
 
-        // CHANGED: usa playerInput se disponível (fallback para Input antigo)
-        float move = playerInput != null ? playerInput.GetHorizontal() : Input.GetAxisRaw("Horizontal"); // CHANGED
+       
+        float move = playerInput != null ? playerInput.GetHorizontal() : Input.GetAxisRaw("Horizontal");
 
-        // Movimento
+        
         if (!isAttacking && !isSliding)
             rb.linearVelocity = new Vector2(move * speed, rb.linearVelocity.y);
         else if (isAttacking)
@@ -117,17 +117,17 @@ public class ElfController : MonoBehaviour
                                                       attack3PivotInitialScale.z);
         }
 
-        // CHANGED: Jump input via PlayerInput (fallback para KeyCode.Space)
-        if ((playerInput != null ? playerInput.GetJumpDown() : Input.GetKeyDown(KeyCode.Space)) && isGrounded && !isAttacking && !isSliding) // CHANGED
+        
+        if ((playerInput != null ? playerInput.GetJumpDown() : Input.GetKeyDown(KeyCode.Space)) && isGrounded && !isAttacking && !isSliding) 
             Jump();
 
-        // CHANGED: Slide input via PlayerInput (fallback para LeftShift)
-        if ((playerInput != null ? playerInput.GetDodgeDown() : Input.GetKeyDown(KeyCode.LeftShift)) && isGrounded && !isAttacking && !isSliding) // CHANGED
-            StartCoroutine(SlideCoroutine()); // <-- agora o slide dá invulnerabilidade
+        
+        if ((playerInput != null ? playerInput.GetDodgeDown() : Input.GetKeyDown(KeyCode.LeftShift)) && isGrounded && !isAttacking && !isSliding) 
+            StartCoroutine(SlideCoroutine()); 
 
         if (!isAttacking && isGrounded && !isSliding)
         {
-            // CHANGED: attack inputs via PlayerInput (com fallback)
+            
             if (playerInput != null)
             {
                 if (playerInput.GetAction1Down()) Attack("Attack1");
@@ -137,10 +137,10 @@ public class ElfController : MonoBehaviour
             else
             {
                 if (Input.GetKeyDown(KeyCode.Z)) Attack("Attack1");
-                else if (Input.GetKeyDown(KeyCode.X)) Attack("Attack2"); // <-- NÃO chama ShootProjectile() aqui
+                else if (Input.GetKeyDown(KeyCode.X)) Attack("Attack2"); 
                 else if (Input.GetKeyDown(KeyCode.C)) Attack("Attack3");
             }
-            // CHANGED
+           
         }
 
         anim.SetBool("isGrounded", isGrounded);
@@ -164,7 +164,7 @@ public class ElfController : MonoBehaviour
         isSliding = true;
         anim.SetBool("isSliding", true);
 
-        // <-- Ativa invulnerabilidade no slide
+       
         if (damageable != null)
             damageable.SetInvulnerable(true);
 
@@ -181,7 +181,7 @@ public class ElfController : MonoBehaviour
         isSliding = false;
         anim.SetBool("isSliding", false);
 
-        // <-- Desativa invulnerabilidade após o slide
+        
         if (damageable != null)
             damageable.SetInvulnerable(false);
     }
@@ -191,14 +191,14 @@ public class ElfController : MonoBehaviour
         isAttacking = true;
         anim.SetTrigger(attackName);
 
-        // CHANGED: inicia fallback que limpa isAttacking caso o Animation Event EndAttack não seja disparado
+        
         if (attackTimeoutCoroutine != null) StopCoroutine(attackTimeoutCoroutine);
-        attackTimeoutCoroutine = StartCoroutine(AttackTimeoutCoroutine()); // CHANGED
+        attackTimeoutCoroutine = StartCoroutine(AttackTimeoutCoroutine()); 
 
-        // OBS: ShootProjectile deve ser chamado por Animation Event (ex: "ShootProjectile")
+        
     }
 
-    // CHANGED: garante que quando o Animation Event chamar EndAttack, a coroutine de timeout é parada
+    
     public void EndAttack()
     {
         isAttacking = false;
@@ -208,26 +208,23 @@ public class ElfController : MonoBehaviour
             attackTimeoutCoroutine = null;
         }
     }
-    // ============================
+    
 
-    // CHANGED: coroutine de fallback que garante não travar indefinidamente em isAttacking
+   
     private IEnumerator AttackTimeoutCoroutine()
     {
         yield return new WaitForSeconds(maxAttackDuration);
         if (isAttacking)
         {
-            // se ainda estiver atacando, limpa o estado e loga para debug
+            
             isAttacking = false;
             Debug.LogWarning($"{name}: EndAttack fallback acionado após {maxAttackDuration}s (possível Animation Event faltando).");
-            // limpa referência
         }
         attackTimeoutCoroutine = null;
     }
-    // ============================
+    
 
-    // ============================
-    // EnableHitbox aplica dano imediatamente via OverlapCollider
-    // ============================
+
     public void EnableHitbox(string hitboxName)
     {
         GameObject hb = null;
@@ -310,13 +307,21 @@ public class ElfController : MonoBehaviour
 
     private void OnTakeHit(float dmg)
     {
+       
+        EndAttack(); 
         anim.SetTrigger("TakeHit");
+
+        Debug.Log($"{name}: OnTakeHit recebido. Dano: {dmg} — isAttacking resetado.");
     }
 
     private void OnDeath()
     {
         if (isDead) return;
         isDead = true;
+
+        
+        EndAttack(); 
+
         this.enabled = false;
     }
 

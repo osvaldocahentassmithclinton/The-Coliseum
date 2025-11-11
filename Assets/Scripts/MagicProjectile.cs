@@ -16,7 +16,7 @@ public class MagicProjectile : MonoBehaviour
         owner = caster;
         Destroy(gameObject, lifetime);
 
-        // Flipar o sprite se estiver indo para a esquerda
+        
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         if (sr != null)
             sr.flipX = direction.x < 0;
@@ -33,7 +33,7 @@ public class MagicProjectile : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (hasHit) return;
-        if (other.gameObject == owner) return; // Ignora o próprio mago
+        if (other.gameObject == owner) return; 
 
         Damageable dmg = other.GetComponent<Damageable>();
         if (dmg != null)
@@ -48,7 +48,7 @@ public class MagicProjectile : MonoBehaviour
             anim.SetTrigger("Impact");
     }
 
-    // Chamado por Animation Event no final da animação de impacto
+  
     public void DestroySelf()
     {
         Destroy(gameObject);

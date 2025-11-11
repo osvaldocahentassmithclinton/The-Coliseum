@@ -1,13 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement; // Necessário para carregar cenas
+using UnityEngine.SceneManagement; 
 public class OpcoesInGame : MonoBehaviour
 {
     [Header("Referências UI")]
     public GameObject painelOpcoesInGame;
     public Slider sliderBrilhoInGame;
     public Slider sliderVolumeMusicaInGame;
-    public Image mascaraBrilho; // Imagem preta semi-transparente sobre a tela
+    public Image mascaraBrilho; 
 
     [Header("Referência ao Audio")]
     public AudioSource musicaDeFundo;
@@ -49,11 +49,11 @@ public class OpcoesInGame : MonoBehaviour
 
     public void AplicarBrilho(float valor)
     {
-        // O valor de brilho vai de 0 (escuro) até 1 (sem escurecimento)
+      
         if (mascaraBrilho != null)
         {
             Color corAtual = mascaraBrilho.color;
-            corAtual.a = 1f - valor; // Inverter: mais brilho = menos alpha
+            corAtual.a = 1f - valor; 
             mascaraBrilho.color = corAtual;
         }
 
@@ -70,10 +70,9 @@ public class OpcoesInGame : MonoBehaviour
 
     public void VoltarAoMenuPrincipal()
     {
-        // Você pode salvar configurações antes de sair, se necessário
+        
         PlayerPrefs.Save();
 
-        // Substitua "MenuPrincipal" pelo nome exato da sua cena de menu
         SceneManager.LoadScene("menu");
     }
 

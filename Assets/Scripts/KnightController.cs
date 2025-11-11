@@ -13,15 +13,14 @@ public class KnightController : MonoBehaviour
 
     [Header("Combate")]
     [SerializeField] private GameObject hitbox;
-    [SerializeField] private string hitboxChildName = "AttackHitbox"; // Nome para busca automática
+    [SerializeField] private string hitboxChildName = "AttackHitbox"; 
 
     private Rigidbody2D rb;
     private Animator anim;
     private SpriteRenderer sr;
     private Damageable damageable;
 
-    // CHANGED: PlayerInput reference
-    private PlayerInput playerInput; // CHANGED
+    private PlayerInput playerInput; 
 
     private float timeSinceAttack;
     private bool isGrounded;
@@ -39,10 +38,10 @@ public class KnightController : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         damageable = GetComponent<Damageable>();
 
-        // CHANGED: init PlayerInput
-        playerInput = GetComponent<PlayerInput>(); // CHANGED
+        
+        playerInput = GetComponent<PlayerInput>(); 
         if (playerInput == null)
-            Debug.LogWarning($"{name}: PlayerInput não encontrado. Adicione PlayerInput ao prefab e defina playerId."); // CHANGED
+            Debug.LogWarning($"{name}: PlayerInput não encontrado. Adicione PlayerInput ao prefab e defina playerId.");
 
         selfLayerID = gameObject.layer;
         rb.gravityScale = gravityScale;
@@ -66,11 +65,11 @@ public class KnightController : MonoBehaviour
     {
         if (isDead || isRolling) return;
 
-        // CHANGED: read inputs via playerInput with fallback
-        float moveInput = playerInput != null ? playerInput.GetHorizontal() : Input.GetAxisRaw("Horizontal"); // CHANGED
-        bool wantsToJump = playerInput != null ? playerInput.GetJumpDown() : Input.GetKey(KeyCode.Space); // CHANGED (note: GetJumpDown returns bool on button down)
-        bool wantsToAttack = playerInput != null ? playerInput.GetAction1Down() : Input.GetMouseButtonDown(0); // CHANGED
-        bool wantsToRoll = playerInput != null ? playerInput.GetDodgeDown() : Input.GetKeyDown(KeyCode.LeftShift); // CHANGED
+       
+        float moveInput = playerInput != null ? playerInput.GetHorizontal() : Input.GetAxisRaw("Horizontal"); 
+        bool wantsToJump = playerInput != null ? playerInput.GetJumpDown() : Input.GetKey(KeyCode.Space); 
+        bool wantsToAttack = playerInput != null ? playerInput.GetAction1Down() : Input.GetMouseButtonDown(0);
+        bool wantsToRoll = playerInput != null ? playerInput.GetDodgeDown() : Input.GetKeyDown(KeyCode.LeftShift); 
 
         if (!isAttacking)
             timeSinceAttack += Time.deltaTime;
@@ -134,7 +133,7 @@ public class KnightController : MonoBehaviour
 
     public void EndAttack() => isAttacking = false;
 
-    // EnableHitbox com Overlap imediato
+   
     public void EnableHitbox()
     {
         if (hitbox == null) return;
@@ -195,7 +194,7 @@ public class KnightController : MonoBehaviour
         isRolling = true;
         anim.SetBool("isRolling", true);
 
-        // <-- Ativa invulnerabilidade durante o roll
+        
         if (damageable != null)
             damageable.SetInvulnerable(true);
 
@@ -207,7 +206,7 @@ public class KnightController : MonoBehaviour
         isRolling = false;
         anim.SetBool("isRolling", false);
 
-        // <-- Desativa invulnerabilidade ao final
+       
         if (damageable != null)
             damageable.SetInvulnerable(false);
     }

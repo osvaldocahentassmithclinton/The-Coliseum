@@ -5,7 +5,7 @@ using TMPro;
 
 public class UIManager : MonoBehaviour
 {
-    // Singleton
+   
     public static UIManager Instance;
 
     [Header("Referências das Barras de Vida")]
@@ -25,7 +25,7 @@ public class UIManager : MonoBehaviour
 
     private void Awake()
     {
-        // Configura singleton
+        
         if (Instance == null)
         {
             Instance = this;
@@ -42,7 +42,7 @@ public class UIManager : MonoBehaviour
         if (endGamePanel != null)
             endGamePanel.SetActive(false);
 
-        // tenta encontrar os players automaticamente
+       
         GameObject p1Obj = GameObject.FindGameObjectWithTag("Player1");
         GameObject p2Obj = GameObject.FindGameObjectWithTag("Player2");
 
@@ -51,7 +51,7 @@ public class UIManager : MonoBehaviour
         if (p2Obj != null)
             player2 = p2Obj.GetComponent<Damageable>();
 
-        // inicializa sliders
+       
         if (player1 != null && player1HealthBar != null)
         {
             player1HealthBar.maxValue = player1.maxHealth;
@@ -68,13 +68,13 @@ public class UIManager : MonoBehaviour
     {
         if (player1 == null || player2 == null) return;
 
-        // atualiza vida em tempo real
+       
         if (player1HealthBar != null)
             player1HealthBar.value = player1.CurrentHealth;
         if (player2HealthBar != null)
             player2HealthBar.value = player2.CurrentHealth;
 
-        // checa fim de jogo (opcional, caso queira que o UIManager também detecte)
+     
         if ((player1.IsDead || player2.IsDead) && endGamePanel != null && !endGamePanel.activeSelf)
         {
             string message;
@@ -90,7 +90,7 @@ public class UIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Chama a tela de fim de jogo e mostra a mensagem passada
+    
     /// </summary>
     public void ShowEndGameScreen(string message)
     {
@@ -101,10 +101,10 @@ public class UIManager : MonoBehaviour
         if (winnerText != null)
             winnerText.text = message;
 
-        Time.timeScale = 0f; // pausa o jogo
+        Time.timeScale = 0f;
     }
 
-    // chamado pelos botões do UI
+    
     public void ReturnToCharacterSelection()
     {
         Time.timeScale = 1f;
