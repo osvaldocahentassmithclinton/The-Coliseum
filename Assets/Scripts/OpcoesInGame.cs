@@ -1,16 +1,19 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement; 
+using UnityEngine.SceneManagement;
+
 public class OpcoesInGame : MonoBehaviour
 {
     [Header("Referências UI")]
     public GameObject painelOpcoesInGame;
     public Slider sliderBrilhoInGame;
     public Slider sliderVolumeMusicaInGame;
-    public Image mascaraBrilho; 
+    public Image mascaraBrilho;
 
     [Header("Referência ao Audio")]
     public AudioSource musicaDeFundo;
+
+    private AudioSource persistentMusicSource; 
 
     void Update()
     {
@@ -29,6 +32,26 @@ public class OpcoesInGame : MonoBehaviour
         sliderVolumeMusicaInGame.value = volumeSalvo;
 
         AplicarBrilho(brilhoSalvo);
+
+
+        GameObject persistent = GameObject.Find("PersistentMusic");
+        if (persistent != null)
+        {
+            persistentMusicSource = persistent.GetComponent<AudioSource>();
+            if (persistentMusicSource != null)
+            {
+
+                persistentMusicSource.volume = volumeSalvo;
+            }
+        }
+        else
+        {
+
+            if (musicaDeFundo != null)
+                musicaDeFundo.volume = volumeSalvo;
+        }
+
+
         AplicarVolume(volumeSalvo);
 
         sliderBrilhoInGame.onValueChanged.AddListener(AplicarBrilho);
@@ -49,11 +72,10 @@ public class OpcoesInGame : MonoBehaviour
 
     public void AplicarBrilho(float valor)
     {
-      
         if (mascaraBrilho != null)
         {
             Color corAtual = mascaraBrilho.color;
-            corAtual.a = 1f - valor; 
+            corAtual.a = 1f - valor;
             mascaraBrilho.color = corAtual;
         }
 
@@ -62,19 +84,23 @@ public class OpcoesInGame : MonoBehaviour
 
     public void AplicarVolume(float volume)
     {
-        if (musicaDeFundo != null)
+
+        if (persistentMusicSource != null)
+        {
+            persistentMusicSource.volume = volume;
+        }
+        else if (musicaDeFundo != null)
+        {
             musicaDeFundo.volume = volume;
+        }
+
 
         PlayerPrefs.SetFloat("VolumeMusica", volume);
     }
 
     public void VoltarAoMenuPrincipal()
     {
-        
         PlayerPrefs.Save();
-
         SceneManager.LoadScene("menu");
     }
-
-
 }
